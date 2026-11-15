@@ -1138,7 +1138,8 @@
           dates: "Lanzamiento: 16 jul. 1969 | Alunizaje: 20 jul. 1969 | Fin del paquete científico: 27 ago. 1969",
           hardware: "Etapa de descenso del Eagle (2.034 kg), sismómetro pasivo, detector de polvo lunar y retrorreflector láser (LRRR).",
           facts: "¡La primera vez que la humanidad pisó la Luna! Neil y Buzz pilotaron de pie porque no había asientos, caminaron 250 metros y dejaron el espejo láser que sigue operativo hoy.",
-          links: ["https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059C"]
+          links: ["https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059C"],
+          video: "https://www.youtube.com/embed/S9HdPi9Ikhk"
         }
       },
       {
@@ -1177,7 +1178,8 @@
             "https://science.nasa.gov/mission/surveyor-3/",
             "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-099C",
             "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1971-063C"
-          ]
+          ],
+          video:"https://www.youtube.com/embed/oYEgdZ3iEKA"
         }
       },
       {
@@ -1218,7 +1220,8 @@
             "https://nssdc.gsfc.nasa.gov/planetary/mars/mariner.html",
             "https://nssdc.gsfc.nasa.gov/planetary/viking.html",
             "https://nssdc.gsfc.nasa.gov/planetary/mesur.html"
-          ]
+          ],
+          video:"https://www.youtube.com/embed/KGNV2Pu9Ms0"
         }
       },
       {
@@ -1257,7 +1260,8 @@
           links: [
             "https://science.nasa.gov/mission/mars-exploration-rovers-spirit-and-opportunity/",
             "https://science.nasa.gov/mission/insight/"
-          ]
+          ],
+          video:"https://www.youtube.com/embed/1Ll-VHYxWXU"
         }
       },
       {
@@ -1296,7 +1300,8 @@
           facts: "Logró el equivalente al vuelo de los hermanos Wright en otro mundo, superando sus 5 vuelos planeados hasta alcanzar 72 vuelos exitosos.",
           links: [
             "https://science.nasa.gov/mission/mars-2020-perseverance/ingenuity-mars-helicopter/"
-          ]
+          ],
+          video: "https://www.youtube.com/embed/wMnOo2zcjXA"
         }
       },
       {
@@ -1335,7 +1340,8 @@
             "https://science.nasa.gov/mission/dawn/",
             "https://science.nasa.gov/mission/kepler/",
             "https://science.nasa.gov/mission/pioneer-10/"
-          ]
+          ],
+          video: "https://www.youtube.com/embed/_V7J05fK5e0"
         }
       }
     ];
@@ -2019,15 +2025,32 @@
       openStellariumMode(ch.targetScene, ch.targetArtifactId);
     }
 
-    function openNasaInfoModal() {
+   function openNasaInfoModal() {
+      stopCurrentSpeech();
       const ch = chapters[currentChapterIndex];
       const d = ch.nasaData;
+
+      const videoHTML = d.video ? `
+        <div class="mb-4 rounded-xl overflow-hidden border border-amber-400/40 bg-black aspect-video shadow-lg">
+          <iframe
+            src="${d.video}?rel=0"
+            title="${d.mission}"
+            class="w-full h-full"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen>
+          </iframe>
+        </div>
+      ` : '';
+
       document.getElementById('nasa-info-content').innerHTML = `
         <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/20 text-amber-300">
           🛰️ Ficha Oficial NASA Science / NSSDCA • ${ch.num}
         </span>
-        <h3 class="text-xl md:text-2xl font-display font-bold text-white mt-3 mb-4">${d.mission}</h3>
-        <div class="space-y-3 text-xs md:text-sm text-slate-200">
+        <h3 class="text-xl md:text-2xl font-display font-bold text-white mt-3 mb-3">${d.mission}</h3>
+        ${videoHTML}
+        <div class="space-y-2.5 text-xs md:text-sm text-slate-200">
           <p><strong class="text-amber-300">📍 Ubicación y Coordenadas:</strong> ${d.location}</p>
           <p><strong class="text-amber-300">📅 Fechas Clave:</strong> ${d.dates}</p>
           <p><strong class="text-amber-300">🛠️ Instrumentación y Componentes:</strong> ${d.hardware}</p>
@@ -2047,6 +2070,7 @@
 
     function closeNasaInfoModal() {
       document.getElementById('nasa-info-modal').classList.add('hidden');
+      document.getElementById('nasa-info-content').innerHTML = '';
     }
 
     function toggleFullscreenStage() {
@@ -2819,3 +2843,4 @@
   </script>
 </body>
 </html>
+
