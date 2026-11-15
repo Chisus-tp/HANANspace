@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ecos en el Polvo & Ecos del Sistema Solar | HANANteam • NASA Space Apps</title>
+  <title>Silicon Heroes Tales | Ecos en el Polvo • HANANteam</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -148,7 +148,7 @@
         <a href="#vision" class="hover:text-amber-400 transition">Nuestra Visión</a>
         <a href="#desafio" class="hover:text-amber-400 transition">El Desafío</a>
         <a href="#especial" class="hover:text-amber-400 transition">Lo Especial</a>
-        <a href="#inventario-completo" class="hover:text-amber-400 transition">20 Misiones NASA</a>
+        <a href="#inventario-completo" class="hover:text-amber-400 transition">18 Misiones NASA</a>
         <a href="#equipo" class="hover:text-amber-400 transition">Equipo</a>
       </nav>
 
@@ -383,7 +383,7 @@
 
         <div class="absolute top-3 left-3 right-3 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
           <div class="stellarium-box px-3.5 py-1.5 pointer-events-auto">
-            <h3 id="ui-app-title" class="text-xs md:text-sm font-bold tracking-wider text-white uppercase">ECOS DEL SISTEMA SOLAR (20 MISIONES)</h3>
+            <h3 id="ui-app-title" class="text-xs md:text-sm font-bold tracking-wider text-white uppercase">ECOS DEL SISTEMA SOLAR (18 MISIONES)</h3>
           </div>
 
           <div class="stellarium-box p-1 flex flex-wrap items-center gap-1 pointer-events-auto">
@@ -396,7 +396,7 @@
             </button>
             <button onclick="switchScene('mars')" id="btn-mars" class="stellarium-btn px-2.5 py-1 text-xs font-mono flex items-center gap-1">
               <span id="ui-nav-mars">Marte</span>
-              <span id="count-mars" class="px-1 text-[10px] bg-slate-900 text-amber-400 border border-amber-500/30">12</span>
+              <span id="count-mars" class="px-1 text-[10px] bg-slate-900 text-amber-400 border border-amber-500/30">10</span>
             </button>
 
             <div id="view-mode-group" class="hidden items-center gap-1 pl-2 ml-1 border-l border-slate-700">
@@ -414,7 +414,7 @@
           <div class="px-3 py-2 flex items-center justify-between border-b border-sky-500/20 cursor-pointer bg-slate-950/50" onclick="toggleSection('radar-body', 'radar-arrow')">
             <div>
               <div class="text-[11px] font-mono font-bold tracking-wider uppercase text-sky-400" id="ui-radar-title">CATÁLOGO DE OBJETOS</div>
-              <div id="ui-radar-subtitle" class="text-[10px] font-mono text-slate-400">20 artefactos registrados</div>
+              <div id="ui-radar-subtitle" class="text-[10px] font-mono text-slate-400">18 artefactos registrados</div>
             </div>
             <div class="flex items-center gap-1.5">
               <button onclick="event.stopPropagation(); resetCamera();" id="ui-btn-center" class="stellarium-btn px-2 py-0.5 text-[10px] font-mono">Centrar</button>
@@ -583,7 +583,7 @@
           Contar la historia del equipo histórico que la NASA dejó atrás en la Luna, Marte y el espacio profundo desde la década de 1960. El reto nos pedía crear una herramienta educativa enfocada en jóvenes que transformara los catálogos técnicos de la NASA en narrativas memorables.
         </p>
         <p class="text-slate-300 leading-relaxed">
-          Con <strong>HANANteam</strong>, cada módulo lunar, rover marciano y sonda interplanetaria narra en primera persona cómo aterrizó, qué descubrió y en qué coordenadas exactas descansa hoy dentro de nuestro visor <strong>Stellarium 3D/2D</strong>.
+          Con <strong>HANANteam</strong>, cada módulo lunar, rover marciano y sonda interplanetaria narra en primera persona cómo llegó, qué descubrió y dónde se encuentra hoy dentro de nuestro visor <strong>Stellarium 3D/2D</strong>.
         </p>
       </div>
       <div class="bg-slate-900/90 p-6 rounded-2xl border border-slate-800 space-y-3 text-sm">
@@ -592,8 +592,8 @@
           <span class="text-slate-300">La estructura trípode de Surveyor 3 en el Océano de las Tormentas, las etapas de descenso de Eagle, Intrepid y Falcon, estaciones nucleares ALSEP, el primer Rover Lunar (LRV) y el espejo láser LRRR que sigue funcionando hoy.</span>
         </div>
         <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
-          <strong class="text-orange-400 block">🔴 En Marte (Mariner 4/6/7/9, Viking 1/2, Pathfinder, Spirit, Opportunity, Curiosity, InSight, Perseverance e Ingenuity):</strong>
-          <span class="text-slate-300">Desde los primeros sobrevuelos de Mariner 4, 6 y 7 y el primer orbitador Mariner 9, pasando por los aterrizajes de Viking 1 y 2, los airbags de Pathfinder/Sojourner y los gemelos Spirit y Opportunity, hasta Curiosity, InSight, Perseverance e Ingenuity.</span>
+          <strong class="text-orange-400 block">🔴 En Marte (Mariner 4/6/7/9, Viking 1/2, Pathfinder, Spirit, Opportunity, InSight e Ingenuity):</strong>
+          <span class="text-slate-300">Desde los primeros sobrevuelos de Mariner 4, 6 y 7 y el primer orbitador Mariner 9, pasando por los aterrizajes de Viking 1 y 2, los airbags de Pathfinder/Sojourner y los gemelos Spirit y Opportunity, hasta el sismómetro de InSight y el helicóptero Ingenuity.</span>
         </div>
         <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
           <strong class="text-sky-400 block">🌌 En Asteroides y el Espacio Profundo (NEAR, Dawn, Pioneer 10, Kepler):</strong>
@@ -614,7 +614,7 @@
       <div class="bg-slate-900/70 p-6 rounded-2xl border border-slate-800">
         <div class="text-3xl mb-3">🪐</div>
         <h3 class="font-bold text-white text-lg mb-2">Planetario 3D + Mapa 2D</h3>
-        <p class="text-sm text-slate-400">Visor Stellarium HUD integrado con el Sistema Solar, globo 3D y mapa cartográfico equirectangular 2D de la Luna y Marte con coordenadas reales.</p>
+        <p class="text-sm text-slate-400">Visor Stellarium HUD integrado con el Sistema Solar, globo 3D y mapa cartográfico equirectangular 2D de la Luna y Marte con coordenadas reales de alunizaje y aterrizaje.</p>
       </div>
       <div class="bg-slate-900/70 p-6 rounded-2xl border border-slate-800">
         <div class="text-3xl mb-3">🎨</div>
@@ -624,7 +624,7 @@
       <div class="bg-slate-900/70 p-6 rounded-2xl border border-slate-800">
         <div class="text-3xl mb-3">🛰️</div>
         <h3 class="font-bold text-white text-lg mb-2">Telemetría Oficial NSSDCA</h3>
-        <p class="text-sm text-slate-400">Todo el contenido está respaldado directamente por los archivos de NASA Science y el catálogo maestro NSSDCA con 20 misiones documentadas.</p>
+        <p class="text-sm text-slate-400">Todo el contenido está respaldado directamente por los archivos de NASA Science y el catálogo maestro NSSDCA con 18 misiones históricas documentadas.</p>
       </div>
     </div>
   </section>
@@ -632,8 +632,8 @@
   <section id="inventario-completo" class="py-12 px-6 max-w-7xl mx-auto border-t border-slate-800/80">
     <div class="text-center mb-8">
       <span class="text-xs uppercase tracking-widest text-amber-400 font-semibold">Respaldo Documental NASA Science & NSSDCA</span>
-      <h2 class="text-2xl md:text-3xl font-display font-bold text-white mt-1">Catálogo Maestro de las 20 Misiones (Cuento + Mapa 3D)</h2>
-      <p class="text-xs text-slate-400 mt-1">Haz clic en cualquier misión para escuchar su capítulo en el cuento o volar directamente a sus coordenadas en el Planetario 3D.</p>
+      <h2 class="text-2xl md:text-3xl font-display font-bold text-white mt-1">Catálogo Maestro de las 18 Misiones Históricas (Cuento + Mapa 3D)</h2>
+      <p class="text-xs text-slate-400 mt-1">Haz clic en cualquier misión para escuchar su capítulo en el cuento o inspeccionar su telemetría en el Planetario 3D.</p>
     </div>
     <div id="cards-archive" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs"></div>
   </section>
@@ -753,23 +753,23 @@
         chapterIndex: 2,
         body: "mars",
         nssdca: "1964-077A",
-        lat: 37.0000,
-        lon: 173.0000,
+        lat: null,
+        lon: null,
         date: "Lanzamiento: 28 nov 1964 | Sobrevuelo: 14 jul 1965 | Última transmisión: 20 dic 1967",
         mass: "260.8 kg (Sonda de sobrevuelo)",
         power: "4 Paneles Solares + Batería Ag-Zn",
-        status: "Sobrevuelo de Marte a 9.844 km (1.ª imagen en 37° N, 187° O)",
+        status: "Sobrevuelo histórico de Marte a 9.844 km (Hoy en órbita heliocéntrica)",
         instruments: "Sistema de cámaras de televisión, magnetómetro de helio, detector de polvo cósmico, telescopio de rayos cósmicos, cámara de ionización, detector de radiación atrapada y sonda de plasma solar.",
         es: {
-          name: "Mariner 4",
-          objectives: "Fotografiar Marte para conocer su superficie. También buscaba probar tecnologías para llevar a cabo futuras misiones a otros planetas.",
-          story: "Mariner 4 realizó su histórico sobrevuelo y envió imágenes que mostraban una superficie llena de cráteres, muy similar a la Luna. También descubrió que Marte tenía una atmósfera extremadamente delgada.",
-          science: "Primera nave espacial en sobrevolar Marte, pasando a unos 9.844 km de su superficie."
+          name: "Mariner 4 (Sobrevuelo)",
+          objectives: "Fotografiar Marte por primera vez desde el espacio para conocer su superficie y probar tecnologías para futuras misiones interplanetarias.",
+          story: "Mariner 4 realizó su histórico sobrevuelo sin aterrizar y envió imágenes que mostraban una superficie llena de cráteres, descubriendo que Marte tenía una atmósfera extremadamente delgada.",
+          science: "Primera nave espacial en sobrevolar Marte con éxito, pasando a unos 9.844 km de su superficie."
         },
         en: {
-          name: "Mariner 4",
-          objectives: "Photograph Mars to know its surface and test technologies for future planetary missions.",
-          story: "Performed its historic flyby sending images of a cratered surface similar to the Moon and discovered Mars's extremely thin atmosphere.",
+          name: "Mariner 4 (Flyby)",
+          objectives: "Photograph Mars for the first time from space and test technologies for future planetary missions.",
+          story: "Performed its historic flyby without landing, sending images of a cratered surface and discovering Mars's extremely thin atmosphere.",
           science: "First spacecraft to fly by Mars, passing at 9,844 km."
         }
       },
@@ -778,23 +778,23 @@
         chapterIndex: 2,
         body: "mars",
         nssdca: "1969-014A / 030A",
-        lat: -15.0000,
-        lon: 20.0000,
+        lat: null,
+        lon: null,
         date: "Mariner 6: 24 feb 1969 – 23 dic 1970 | Mariner 7: 27 mar 1969 – 23 dic 1970",
         mass: "411.8 kg cada sonda gemela",
         power: "Paneles Solares",
-        status: "Sobrevuelos de Marte (30 jul y 4 ago 1969)",
+        status: "Sobrevuelos de Marte el 30 jul y 4 ago 1969 (Hoy en órbita heliocéntrica)",
         instruments: "Cámaras fotográficas, instrumentos para estudiar la atmósfera y equipos para analizar partículas y radiación espacial.",
         es: {
-          name: "Mariner 6 y 7 (Sondas Gemelas)",
-          objectives: "Fotografiar la superficie de Marte, estudiar su atmósfera y medir su temperatura para ayudar a los científicos a comprender mejor el planeta y preparar futuras misiones para descifrar si alguna vez hubo vida.",
-          story: "Durante el trayecto, la Mariner 7 sufrió un fallo en la batería y perdió comunicación durante siete horas, y sus cámaras fallaron antes de llegar, pero los ingenieros lograron arreglarlo desde la Tierra. Junto con la Mariner 6 enviaron 201 fotografías y descartaron los supuestos canales artificiales en Marte.",
-          science: "¡Eran prácticamente gemelas! Fueron lanzadas con solo 3 días de diferencia, transmitieron más de 200 fotografías y eran capaces de transmitir información casi 2000 veces más rápido que Mariner 4."
+          name: "Mariner 6 y 7 (Sobrevuelos Gemelos)",
+          objectives: "Sobrevolar y fotografiar la superficie de Marte, estudiar su atmósfera y medir su temperatura para preparar futuros aterrizajes.",
+          story: "Durante el trayecto, la Mariner 7 sufrió un fallo en la batería y perdió comunicación durante siete horas, pero los ingenieros lograron recuperarla desde la Tierra. Junto con la Mariner 6 enviaron 201 fotografías en sus sobrevuelos y descartaron los supuestos canales artificiales.",
+          science: "¡Eran prácticamente gemelas! Fueron lanzadas con solo 3 días de diferencia y transmitían información casi 2000 veces más rápido que Mariner 4."
         },
         en: {
-          name: "Mariner 6 & 7 (Twin Probes)",
-          objectives: "Photograph Mars's surface, study its atmosphere, and measure temperatures to prepare future life-seeking missions.",
-          story: "Engineers recovered Mariner 7 after a 7-hour battery failure; together with Mariner 6 they sent 201 photographs and disproved artificial canals on Mars.",
+          name: "Mariner 6 & 7 (Twin Flybys)",
+          objectives: "Fly by and photograph Mars's surface, study its atmosphere, and measure temperatures to prepare future missions.",
+          story: "Engineers recovered Mariner 7 after a 7-hour battery failure; together with Mariner 6 they sent 201 photographs during their flybys and disproved artificial canals on Mars.",
           science: "Twin probes launched 3 days apart, transmitting data nearly 2,000 times faster than Mariner 4."
         }
       },
@@ -803,24 +803,24 @@
         chapterIndex: 2,
         body: "mars",
         nssdca: "1971-051A",
-        lat: -13.9000,
-        lon: -59.2000,
+        lat: null,
+        lon: null,
         date: "Lanzamiento: 30 may 1971 | Llegada a órbita: 14 nov 1971 | Fin: 27 oct 1972",
         mass: "997.9 kg (Primer orbitador marciano)",
         power: "4 Paneles Solares",
-        status: "Órbita de Marte",
-        instruments: "Dos cámaras, espectrómetro ultravioleta e infrarrojo, radiómetro infrarrojo, experimento de ocultación de radio y sistema de mecánica celeste para estudiar la gravedad y las órbitas de las lunas marcianas.",
+        status: "Inactivo en órbita alrededor de Marte (Sin descenso en superficie)",
+        instruments: "Dos cámaras, espectrómetro ultravioleta e infrarrojo, radiómetro infrarrojo, experimento de ocultación de radio y sistema de mecánica celeste para estudiar Fobos y Deimos.",
         es: {
-          name: "Mariner 9",
-          objectives: "Crear un mapa detallado de Marte, estudiar su atmósfera y buscar indicios de actividad volcánica. También se le encomendó explorar sus dos lunas, Fobos y Deimos, para comprender mejor los secretos del Planeta Rojo.",
-          story: "Al llegar a Marte, Mariner 9 encontró una enorme tormenta de polvo que ocultaba el planeta. Los ingenieros decidieron esperar hasta que se despejara y pudieron enviar más de 7000 fotografías. ¡Descubrió antiguos ríos, enormes volcanes y profundos cañones!, ayudando a preparar las misiones Viking.",
-          science: "Su misión gemela, Mariner 8, nunca llegó al espacio: su cohete falló apenas 365 segundos después del lanzamiento."
+          name: "Mariner 9 (Orbitador)",
+          objectives: "Orbitar Marte para crear un mapa global detallado, estudiar su atmósfera, buscar actividad volcánica y explorar sus dos lunas, Fobos y Deimos.",
+          story: "Al entrar en órbita marciana, Mariner 9 encontró una enorme tormenta de polvo que ocultaba el planeta. Los ingenieros esperaron hasta que se despejara y enviaron más de 7000 fotografías desde el espacio, descubriendo antiguos ríos, volcanes gigantes como el Monte Olimpo y profundos cañones.",
+          science: "Primera nave espacial en orbitar otro planeta. Su misión gemela, Mariner 8, falló apenas 365 segundos después del lanzamiento."
         },
         en: {
-          name: "Mariner 9",
-          objectives: "Create a detailed map of Mars, study its atmosphere, search for volcanic activity, and explore Phobos and Deimos.",
-          story: "Waited out a global dust storm to send over 7,000 photographs, discovering ancient rivers, giant volcanoes, and deep canyons.",
-          science: "Its twin mission Mariner 8 failed just 365 seconds after launch."
+          name: "Mariner 9 (Orbiter)",
+          objectives: "Orbit Mars to create a detailed global map, study its atmosphere, search for volcanic activity, and explore Phobos and Deimos.",
+          story: "Waited out a global dust storm from orbit to send over 7,000 photographs, discovering ancient rivers, giant volcanoes, and deep canyons.",
+          science: "First spacecraft to orbit another planet; its twin Mariner 8 failed just 365 seconds after launch."
         }
       },
       {
@@ -830,10 +830,10 @@
         nssdca: "1975-075C",
         lat: 22.2700,
         lon: -47.9500,
-        date: "Lanzamiento: 20 ago / 9 sep 1975 | Aterrizaje: 20 jul 1976 | Fin: 11 abr 1980 / nov 1982",
+        date: "Lanzamiento: 20 ago 1975 | Aterrizaje: 20 jul 1976 | Fin: 11 nov 1982",
         mass: "576 kg (Seca en superficie)",
         power: "2 Generadores Nucleares RTG SNAP-19",
-        status: "Chryse Planitia (22,27° N, 312,05° E)",
+        status: "Chryse Planitia (22,27° N, 47,95° O / 312,05° E)",
         instruments: "Cámaras, brazo robótico para recoger muestras, instrumentos de análisis químico y biológico, estación meteorológica y sismómetro.",
         es: {
           name: "Viking 1",
@@ -855,7 +855,7 @@
         nssdca: "1975-083C",
         lat: 47.6400,
         lon: 134.2900,
-        date: "Lanzamiento: 9 sep 1975 | Aterrizaje: 3 sep 1976 | Fin: 11 abr 1980 / 13 nov 1982",
+        date: "Lanzamiento: 9 sep 1975 | Aterrizaje: 3 sep 1976 | Fin: 11 abr 1980",
         mass: "576 kg (Seca en superficie)",
         power: "2 Generadores Nucleares RTG SNAP-19",
         status: "Utopia Planitia (47,64° N, 134,29° E)",
@@ -949,31 +949,6 @@
         }
       },
       {
-        id: "curiosity",
-        chapterIndex: 3,
-        body: "mars",
-        nssdca: "2011-070A",
-        lat: -4.5900,
-        lon: 137.4400,
-        date: "Lanzamiento: 26 nov 2011 | Aterrizaje: 6 ago 2012 | Fin de misión: continúa operativa (nov 2026)",
-        mass: "899 kg (Tamaño de un automóvil)",
-        power: "Generador Nuclear MMRTG",
-        status: "Misión Activa en Cráter Gale (4,59° S, 137,44° E)",
-        instruments: "Cámaras, láser ChemCam, laboratorio químico SAM, espectrómetros, taladro para rocas y estación meteorológica.",
-        es: {
-          name: "Curiosity (Mars Science Laboratory)",
-          objectives: "Investigar si Marte tuvo alguna vez las condiciones necesarias para albergar vida microscópica. Para ello, debía estudiar sus rocas, suelo, atmósfera y las huellas de antiguos ambientes con agua.",
-          story: "Curiosity tuvo que atravesar la atmósfera y descender suspendido por una 'grúa voladora' que lo depositó cuidadosamente sobre el suelo. Una vez allí, comenzó a explorar el cráter Gale y encontró evidencias de antiguos ríos y lagos, además de sustancias químicas y minerales que indican que microorganismos podrían haber sobrevivido.",
-          science: "Es aproximadamente del tamaño de un automóvil y ha demostrado que el planeta rojo pudo ser mucho más parecido a la Tierra de lo que imaginábamos."
-        },
-        en: {
-          name: "Curiosity Rover (MSL)",
-          objectives: "Investigate whether Mars ever had conditions necessary to support microbial life by studying its rocks, soil, and atmosphere.",
-          story: "Lowered by a sky crane into Gale Crater, finding evidence of ancient rivers, lakes, and chemical building blocks for life.",
-          science: "Car-sized rover still active in November 2026."
-        }
-      },
-      {
         id: "insight",
         chapterIndex: 3,
         body: "mars",
@@ -999,31 +974,6 @@
         }
       },
       {
-        id: "perseverance",
-        chapterIndex: 4,
-        body: "mars",
-        nssdca: "2020-052A",
-        lat: 18.4400,
-        lon: 77.4500,
-        date: "Lanzamiento: 30 jul 2020 | Aterrizaje: 18 feb 2021 | Fin de misión: continúa operativa (nov 2026)",
-        mass: "1,025 kg",
-        power: "Generador Nuclear MMRTG",
-        status: "Misión Activa en Cráter Jezero (18,44° N, 77,45° E)",
-        instruments: "Cámaras Mastcam-Z, SuperCam, PIXL, SHERLOC, RIMFAX, MOXIE y sensores ambientales MEDA.",
-        es: {
-          name: "Perseverance (Mars 2020)",
-          objectives: "Buscar posibles señales de vida antigua, estudiar las rocas de Marte y recolectar muestras que podrían regresar algún día a la Tierra. También busca probar tecnologías que ayuden a futuras misiones humanas.",
-          story: "Perseverance llegó al cráter Jezero, donde existió un antiguo lago alimentado por un río. Durante los 'Siete Minutos de Terror', atravesó la atmósfera marciana, desplegó un paracaídas y descendió mediante una grúa aérea de manera totalmente autónoma. Desde entonces ha explorado el antiguo delta, estudiado rocas y recolectado muestras.",
-          science: "Llevó consigo a Ingenuity, ¡el primer helicóptero que voló en otro planeta!, y puede recoger muestras de rocas y almacenarlas en pequeños tubos para una futura misión que podría traerlas a la Tierra."
-        },
-        en: {
-          name: "Perseverance Rover (Mars 2020)",
-          objectives: "Seek signs of ancient life, study Martian rocks, collect samples for future return to Earth, and test new technologies.",
-          story: "Survived the 'Seven Minutes of Terror' to land autonomously via sky crane in Jezero Crater and explore its ancient river delta.",
-          science: "Carried Ingenuity, the first helicopter to fly on another planet, and stores rock samples in sealed tubes."
-        }
-      },
-      {
         id: "ingenuity",
         chapterIndex: 4,
         body: "mars",
@@ -1037,7 +987,7 @@
         instruments: "Rotores Coaxiales de Fibra de Carbono (1,2 m, 2400 rpm), Altímetro Láser Garmin, Cámara de Navegación y Cámara a Color RTE.",
         es: {
           name: "Helicóptero Marciano Ingenuity",
-          objectives: "Demostrar la viabilidad del primer vuelo propulsado y controlado en la tenue atmósfera de Marte y servir como explorador aéreo para Perseverance.",
+          objectives: "Demostrar la viabilidad del primer vuelo propulsado y controlado en la tenue atmósfera de Marte y servir como explorador aéreo.",
           story: "Con solo 1,8 kg de peso logré el primer vuelo controlado y propulsado en otro planeta el 19 de abril de 2021. Planeado para 5 vuelos, completé 72 vuelos sobre el Cráter Jezero antes de descansar en las dunas.",
           science: "Abrió la era de la exploración aérea interplanetaria en una atmósfera con menos del 1 % de la densidad terrestre."
         },
@@ -1253,14 +1203,14 @@
           </svg>
         `,
         dialogues: [
-          "¡Saludos desde Marte! Nuestra historia comenzó desde el espacio: en 1965 Mariner 4 pasó a 9.844 km en el primer sobrevuelo de Marte, y en 1969 las gemelas Mariner 6 y 7 enviaron 201 fotos descartando los supuestos canales artificiales.",
-          "En 1971 Mariner 9 esperó a que pasara una tormenta global de polvo y envió más de 7.000 fotografías: ¡descubrió antiguos ríos, enormes volcanes y profundos cañones que prepararon el camino para aterrizar!",
-          "En 1976 nosotras, las gemelas Viking 1 y Viking 2, descendimos en Chryse Planitia y Utopia Planitia. Viking 1 fue el primer módulo estadounidense en transmitir imágenes desde la superficie marciana mientras buscábamos señales de vida.",
+          "¡Saludos desde Marte! Nuestra historia comenzó desde el espacio: en 1965 Mariner 4 pasó a 9.844 km en el primer sobrevuelo de Marte, y en 1969 las gemelas Mariner 6 y 7 sobrevolaron el planeta enviando 201 fotos.",
+          "En 1971 Mariner 9 se convirtió en el primer orbitador marciano: esperó desde el espacio a que pasara una tormenta global de polvo y envió más de 7.000 fotografías descubriendo antiguos ríos, enormes volcanes y profundos cañones.",
+          "En 1976 nosotras, las gemelas Viking 1 y Viking 2, sí descendimos hasta el suelo en Chryse Planitia y Utopia Planitia. Viking 1 fue el primer módulo estadounidense en transmitir imágenes desde la superficie marciana.",
           "Y el 4 de julio de 1997 llegué yo, Mars Pathfinder: protegida por enormes airbags reboté sobre Ares Vallis y desplegué a Sojourner, el primer rover marciano, operando casi tres meses cuando solo esperaban una semana."
         ],
         nasaData: {
           mission: "Mariner 4, Mariner 6 y 7, Mariner 9, Viking 1 y 2, y Mars Pathfinder / Sojourner",
-          location: "Marte — Sobrevuelos/Órbita (Mariner 4, 6, 7 y 9) | Viking 1 (22,27° N, 312,05° E) | Viking 2 (47,64° N, 134,29° E) | Pathfinder (19,13° N, 33,22° O).",
+          location: "Marte — Sobrevuelos/Órbita sin descenso (Mariner 4, 6, 7 y 9) | Superficie: Viking 1 (22,27° N, 47,95° O) | Viking 2 (47,64° N, 134,29° E) | Pathfinder (19,13° N, 33,22° O).",
           dates: "Mariner 4: 1964–1967 | Mariner 6 y 7: 1969–1970 | Mariner 9: 1971–1972 | Viking 1 y 2: 1975–1982 | Pathfinder: dic. 1996 – sep. 1997.",
           hardware: "Sondas Mariner de sobrevuelo y órbita, módulos de aterrizaje Viking 1 y 2 con brazo robótico, sismómetro y laboratorio biológico, y módulo Pathfinder con airbags y rover Sojourner con espectrómetro APXS.",
           facts: "Mariner 6 y 7 transmitían datos casi 2000 veces más rápido que Mariner 4; el orbitador de Viking 2 completó más de 700 vueltas; Pathfinder demostró que se podía aterrizar en Marte con airbags.",
@@ -1273,9 +1223,9 @@
       },
       {
         num: "Capítulo 4:",
-        title: "Los Gemelos Incansables, el Laboratorio Rodante y el Médico de Marte",
-        subtitle: "Marte • Spirit & Opportunity (2004–2019), Curiosity (2012–presente) e InSight (2018–2022)",
-        speaker: "🔴 Spirit, Opportunity, Curiosity & InSight",
+        title: "Los Gemelos Incansables y el Médico Geofísico de Marte",
+        subtitle: "Marte • Spirit & Opportunity (2004–2019) e InSight (2018–2022)",
+        speaker: "🔴 Spirit, Opportunity & InSight",
         soundType: "wind",
         soundLabel: "🎧 Paisaje Sonoro: Viento Marciano Realista (Frecuencias Sísmicas de InSight)",
         targetScene: "mars",
@@ -1294,32 +1244,31 @@
         `,
         dialogues: [
           "Somos Spirit y Opportunity, robots gemelos enviados a lados opuestos de Marte en enero de 2004 con una misión diseñada para durar solamente 90 días marcianos.",
-          "¡Superamos todas las expectativas! Spirit trabajó más de 6 años en el cráter Gusev y Opportunity operó casi 15 años en Meridiani Planum, hallando minerales y huellas de antiguos ambientes con agua líquida hasta la enorme tormenta de polvo de 2018.",
-          "En agosto de 2012 descendí yo, Curiosity, del tamaño de un automóvil, suspendido por una 'grúa voladora' sobre el cráter Gale. Sigo operativo demostrando que antiguos ríos y lagos tuvieron minerales donde microorganismos podrían haber sobrevivido.",
-          "Y entre 2018 y 2022, en Elysium Planitia, yo —el módulo InSight— coloqué mi sismómetro sobre el suelo marciano para escuchar el viento y más de 1.300 'martemotos'."
+          "¡Superamos todas las expectativas! Spirit trabajó más de 6 años en el cráter Gusev encontrando rocas y minerales que probaban que Marte fue mucho más húmedo en el pasado.",
+          "Yo, Opportunity, recorrí más de 45 kilómetros durante casi 15 años en Meridiani Planum, descubriendo las famosas esférulas de hematita ('arándanos marcianos') hasta que la enorme tormenta global de polvo de 2018 cubrió mis paneles solares.",
+          "Y entre 2018 y 2022, en Elysium Planitia, yo —el módulo InSight— coloqué mi sismómetro sobre el suelo marciano para escuchar el viento, medir el núcleo líquido del planeta y registrar más de 1.300 'martemotos'."
         ],
         nasaData: {
-          mission: "Spirit y Opportunity (MER), Curiosity (MSL) y Módulo Geofísico InSight",
-          location: "Marte — Spirit (14,57° S, 175,47° E) | Opportunity (1,95° S, 354,47° E) | Curiosity en Cráter Gale (4,59° S, 137,44° E) | InSight en Elysium Planitia (4,50° N, 135,62° E).",
-          dates: "Spirit: 2003–2010 | Opportunity: 2003–2019 | Curiosity: 2011 – continúa operativa (nov. 2026) | InSight: 2018–2022.",
-          hardware: "Rovers gemelos Spirit y Opportunity (cámaras panorámicas, espectrómetros y herramienta de abrasión), rover Curiosity (láser ChemCam, laboratorio SAM y taladro) y lander InSight (sismómetro SEIS).",
-          facts: "Spirit y Opportunity probaron que Marte fue mucho más húmedo en el pasado; Curiosity sigue activo en noviembre de 2026 explorando el cráter Gale.",
+          mission: "Spirit y Opportunity (MER-A / MER-B) y Módulo Geofísico InSight",
+          location: "Marte — Spirit en Cráter Gusev (14,57° S, 175,47° E) | Opportunity en Meridiani Planum (1,95° S, 354,47° E) | InSight en Elysium Planitia (4,50° N, 135,62° E).",
+          dates: "Spirit: 2003–2010 | Opportunity: 2003–2019 | InSight: 2018–2022.",
+          hardware: "Rovers gemelos Spirit y Opportunity (cámaras panorámicas, espectrómetros y herramienta de abrasión de rocas) y lander InSight (sismómetro ultrasensible SEIS y sensores de viento TWINS).",
+          facts: "Spirit y Opportunity probaron que Marte tuvo antiguos ambientes con agua líquida; InSight midió por primera vez el tamaño del núcleo líquido marciano y el grosor de su corteza.",
           links: [
             "https://science.nasa.gov/mission/mars-exploration-rovers-spirit-and-opportunity/",
-            "https://science.nasa.gov/mission/msl-curiosity/",
             "https://science.nasa.gov/mission/insight/"
           ]
         }
       },
       {
         num: "Capítulo 5:",
-        title: "Siete Minutos de Terror y el Primer Helicóptero en Otro Planeta",
-        subtitle: "Marte • Cráter Jezero: Perseverance (2021–presente) e Ingenuity (2021–2024)",
-        speaker: "🚁 Rover Perseverance & Helicóptero Marciano Ingenuity",
+        title: "El Primer Helicóptero en Volar sobre Otro Planeta",
+        subtitle: "Marte • Cráter Jezero: Helicóptero Ingenuity (2021–2024)",
+        speaker: "🚁 Helicóptero Marciano Ingenuity",
         soundType: "rotor",
         soundLabel: "🎧 Paisaje Sonoro: Rotores Coaxiales a 2.400 RPM en Atmósfera Marciana",
         targetScene: "mars",
-        targetArtifactId: "perseverance",
+        targetArtifactId: "ingenuity",
         svgIllustration: `
           <svg viewBox="0 0 220 220" class="w-48 h-48 md:w-68 md:h-68 drop-shadow-[0_0_40px_rgba(251,146,60,0.5)]">
             <circle cx="110" cy="110" r="88" fill="#9a3412"/>
@@ -1334,19 +1283,18 @@
           </svg>
         `,
         dialogues: [
-          "¡Hola desde el cráter Jezero! Soy Perseverance. El 18 de febrero de 2021 superé de manera totalmente autónoma los 'Siete Minutos de Terror', descendiendo con paracaídas y grúa aérea sobre un antiguo lago alimentado por un río.",
-          "Continúo operativo buscando señales de vida antigua, produciendo oxígeno con MOXIE y guardando muestras de rocas en pequeños tubos para una futura misión que podría traerlas a la Tierra.",
-          "Y bajo mi vientre llevé a Ingenuity, ¡el primer helicóptero que voló en otro planeta! Con solo 1,8 kg de peso logró despegar el 19 de abril de 2021 en un aire con menos del 1 % de la densidad terrestre.",
-          "Planeado para apenas 5 vuelos, Ingenuity completó 72 vuelos sobre el cráter Jezero antes de descansar en las dunas en enero de 2024."
+          "¡Hola desde el cráter Jezero! Soy Ingenuity, el primer helicóptero de la historia en volar de forma propulsada y controlada en otro planeta.",
+          "Con apenas 1,8 kg de peso en la Tierra (0,68 kg en la gravedad marciana), mis dos rotores de fibra de carbono tenían que girar a 2.400 revoluciones por minuto para elevarme en un aire con menos del 1 % de la densidad terrestre.",
+          "El 19 de abril de 2021 logré mi histórico primer vuelo. Aunque fui diseñado como una demostración tecnológica para solo 5 vuelos en 30 días, volé durante casi tres años como explorador aéreo.",
+          "Completé 72 vuelos recorriendo más de 17 kilómetros hasta que una de mis palas sufrió daños al aterrizar en enero de 2024. Hoy descanso en las dunas de Valinor Hills como el pionero de la aviación interplanetaria."
         ],
         nasaData: {
-          mission: "Rover Perseverance (Mars 2020) y Helicóptero Marciano Ingenuity",
-          location: "Marte — Cráter Jezero (18,44° N, 77,45° E).",
-          dates: "Lanzamiento: 30 jul. 2020 | Aterrizaje: 18 feb. 2021 | Perseverance: continúa operativa (nov. 2026) | Ingenuity: 72 vuelos hasta ene. 2024.",
-          hardware: "Rover Perseverance con cámaras Mastcam-Z, SuperCam, PIXL, SHERLOC, RIMFAX, MOXIE, sensores MEDA y tubos de muestras; Helicóptero solar Ingenuity de 1,8 kg.",
-          facts: "Perseverance descendió de forma autónoma sin ayuda directa de la Tierra; sus descubrimientos buscan responder si estuvimos alguna vez acompañados por vida en Marte.",
+          mission: "Helicóptero Marciano Ingenuity (2020-052B)",
+          location: "Marte — Valinor Hills, Cráter Jezero (18,4447° N, 77,4508° E).",
+          dates: "Llegada a Marte: 18 feb. 2021 | 1.er vuelo: 19 abr. 2021 | Fin de misión: 25 ene. 2024 (72 vuelos).",
+          hardware: "Rotores coaxiales contrarrotatorios de fibra de carbono (1,2 m de diámetro, 2400 rpm), panel solar superior, 6 baterías Li-Ion, altímetro láser Garmin y cámaras de navegación y color RTE.",
+          facts: "Logró el equivalente al vuelo de los hermanos Wright en otro mundo, superando sus 5 vuelos planeados hasta alcanzar 72 vuelos exitosos.",
           links: [
-            "https://science.nasa.gov/mission/mars-2020-perseverance/",
             "https://science.nasa.gov/mission/mars-2020-perseverance/ingenuity-mars-helicopter/"
           ]
         }
@@ -2125,7 +2073,7 @@
 
     const I18N = {
       es: {
-        appTitle: "ECOS DEL SISTEMA SOLAR (20 MISIONES)",
+        appTitle: "ECOS DEL SISTEMA SOLAR (18 MISIONES)",
         navSolar: "El Sistema Solar (8)",
         navMoon: "La Luna",
         navMars: "Marte",
@@ -2137,7 +2085,7 @@
         tabDetailed: "Información Detallada"
       },
       en: {
-        appTitle: "ECHOES OF THE SOLAR SYSTEM (20 MISSIONS)",
+        appTitle: "ECHOES OF THE SOLAR SYSTEM (18 MISSIONS)",
         navSolar: "Solar System (8)",
         navMoon: "The Moon",
         navMars: "Mars",
@@ -2402,7 +2350,8 @@
         );
         rootGroup.add(planetMesh);
 
-        const list = ARTIFACTS.filter(a => a.body === mode);
+        // Solo colocar marcadores en la superficie si tienen lat y lon (excluye sobrevuelos/orbitadores Mariner)
+        const list = ARTIFACTS.filter(a => a.body === mode && a.lat !== null && a.lon !== null);
         list.forEach(art => {
           const phi = (90 - art.lat) * (Math.PI / 180);
           const theta = (art.lon + 180) * (Math.PI / 180);
@@ -2484,7 +2433,8 @@
         ctx2D.fillText(`${lat}°`, startX + 4, y - 4);
       }
 
-      const list = ARTIFACTS.filter(a => a.body === currentScene);
+      // Solo dibujar en el mapa 2D las misiones que aterrizaron en la superficie (lat y lon no nulos)
+      const list = ARTIFACTS.filter(a => a.body === currentScene && a.lat !== null && a.lon !== null);
       list.forEach(art => {
         const normLon = art.lon > 180 ? art.lon - 360 : art.lon;
         const ax = startX + ((normLon + 180) / 360) * mapW;
@@ -2551,7 +2501,7 @@
       const localX = e.clientX - rect.left;
       const localY = e.clientY - rect.top;
 
-      const list = ARTIFACTS.filter(a => a.body === currentScene);
+      const list = ARTIFACTS.filter(a => a.body === currentScene && a.lat !== null && a.lon !== null);
       list.forEach(art => {
         if (art._screen2D && Math.hypot(localX - art._screen2D.x, localY - art._screen2D.y) < 18) {
           openArtifact(art);
@@ -2656,13 +2606,18 @@
       document.getElementById('count-mars').innerText = ARTIFACTS.filter(a => a.body === 'mars').length;
       document.getElementById('ui-radar-subtitle').innerText = I18N[currentLang].radarCount(filtered.length);
 
-      listEl.innerHTML = filtered.map(art => `
-        <button onclick="selectFromRadar('${art.id}')" class="w-full text-left p-2 stellarium-btn block ${selectedArtifact && selectedArtifact.id === art.id ? 'stellarium-btn-active' : ''}">
-          <div class="text-[9px] font-mono text-sky-400 uppercase">${art.body.toUpperCase()} • ${art.nssdca}</div>
-          <div class="text-xs font-bold font-mono text-white mt-0.5">${art[currentLang].name}</div>
-          <div class="text-[10px] font-mono text-slate-400">Lat ${art.lat}° | Lon ${art.lon}°</div>
-        </button>
-      `).join('');
+      listEl.innerHTML = filtered.map(art => {
+        const coordsSub = (art.lat !== null && art.lon !== null)
+          ? `Lat ${art.lat}° | Lon ${art.lon}°`
+          : `Sobrevuelo / Órbita (Sin descenso en superficie)`;
+        return `
+          <button onclick="selectFromRadar('${art.id}')" class="w-full text-left p-2 stellarium-btn block ${selectedArtifact && selectedArtifact.id === art.id ? 'stellarium-btn-active' : ''}">
+            <div class="text-[9px] font-mono text-sky-400 uppercase">${art.body.toUpperCase()} • ${art.nssdca}</div>
+            <div class="text-xs font-bold font-mono text-white mt-0.5">${art[currentLang].name}</div>
+            <div class="text-[10px] font-mono text-slate-400">${coordsSub}</div>
+          </button>
+        `;
+      }).join('');
     }
 
     function selectFromRadar(id) {
@@ -2670,7 +2625,7 @@
       if (!art) return;
       if (currentScene !== art.body) switchScene(art.body);
 
-      if (art.body !== 'solar') {
+      if (art.body !== 'solar' && art.lat !== null && art.lon !== null) {
         const lonRad = (art.lon + 90) * (Math.PI / 180);
         const latRad = art.lat * (Math.PI / 180);
         rootGroup.rotation.y = -lonRad;
@@ -2686,13 +2641,18 @@
       selectedArtifact = art;
       playQuindarTone(true);
 
+      const hasCoords = art.lat !== null && art.lon !== null;
+      const coordsFormatted = hasCoords
+        ? `Lat: ${art.lat.toFixed(4)}° | Lon: ${art.lon.toFixed(4)}°`
+        : `Sobrevuelo / Órbita (Sin descenso en superficie)`;
+
       const badgeLabel = art.body === 'moon' ? 'LUNA' : (art.body === 'mars' ? 'MARTE' : 'ESPACIO PROFUNDO');
       document.getElementById('detail-panel').classList.remove('hidden');
       document.getElementById('detail-badge').innerText = badgeLabel;
       document.getElementById('detail-nssdca').innerText = `NSSDCA: ${art.nssdca}`;
       document.getElementById('detail-title').innerText = art[currentLang].name;
-      document.getElementById('detail-coords').innerText = `Lat: ${art.lat.toFixed(4)}° | Lon: ${art.lon.toFixed(4)}°`;
-      document.getElementById('cursor-coords').innerText = `Lat: ${art.lat.toFixed(4)}° | Lon: ${art.lon.toFixed(4)}°`;
+      document.getElementById('detail-coords').innerText = coordsFormatted;
+      document.getElementById('cursor-coords').innerText = coordsFormatted;
 
       document.getElementById('detail-objectives').innerText = art[currentLang].objectives || '';
       document.getElementById('detail-story').innerText = art[currentLang].story;
@@ -2703,7 +2663,7 @@
       document.getElementById('tech-mass').innerText = art.mass;
       document.getElementById('tech-power').innerText = art.power;
       document.getElementById('tech-status').innerText = art.status;
-      document.getElementById('tech-coords').innerText = `${art.lat}°, ${art.lon}°`;
+      document.getElementById('tech-coords').innerText = hasCoords ? `${art.lat}°, ${art.lon}°` : 'Sobrevuelo / Órbita';
       document.getElementById('tech-instruments').innerText = art.instruments;
     }
 
@@ -2842,7 +2802,7 @@
               📖 Ir al Cuento
             </button>
             <button onclick="openStellariumMode('${art.body}', '${art.id}')" class="flex-1 py-1.5 px-2.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-400/30 font-semibold text-[11px] transition">
-              🪐 Ver en 3D/2D
+              🪐 Ver Ficha / 3D
             </button>
           </div>
         </div>
