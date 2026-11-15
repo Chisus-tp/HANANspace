@@ -1,0 +1,2862 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ecos en el Polvo & Ecos del Sistema Solar | HANANteam • NASA Space Apps</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #060814;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+    .font-story {
+      font-family: 'Fredoka', cursive, sans-serif;
+    }
+    .font-display {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .starfield {
+      background-color: #050814;
+      background-image:
+        radial-gradient(1.5px 1.5px at 25px 35px, #ffffff, transparent),
+        radial-gradient(1px 1px at 85px 75px, #fde047, transparent),
+        radial-gradient(2px 2px at 160px 120px, #ffffff, transparent),
+        radial-gradient(1px 1px at 230px 40px, #93c5fd, transparent),
+        radial-gradient(1.5px 1.5px at 310px 180px, #ffffff, transparent),
+        radial-gradient(1px 1px at 120px 250px, #fca5a5, transparent);
+      background-size: 350px 300px;
+      animation: twinkle 22s linear infinite;
+    }
+    @keyframes twinkle {
+      from { background-position: 0 0; }
+      to { background-position: -350px 300px; }
+    }
+    .falling-ray {
+      position: absolute;
+      width: 3px;
+      height: 36px;
+      border-radius: 999px;
+      background: linear-gradient(to bottom, rgba(251,191,36,0), rgba(251,191,36,0.9));
+      animation: fallDown 3.2s infinite ease-in;
+    }
+    @keyframes fallDown {
+      0% { transform: translateY(-40px) rotate(-12deg); opacity: 0; }
+      30% { opacity: 1; }
+      100% { transform: translateY(480px) rotate(-12deg); opacity: 0; }
+    }
+    .float-slow {
+      animation: floatAnim 5s ease-in-out infinite;
+    }
+    @keyframes floatAnim {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    .dialogue-pop {
+      animation: popIn 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .stellarium-box {
+      position: relative;
+      background: rgba(8, 13, 24, 0.82);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.8);
+    }
+    .stellarium-box::before,
+    .stellarium-box::after {
+      content: "";
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-color: #38bdf8;
+      pointer-events: none;
+    }
+    .stellarium-box::before {
+      top: -1px;
+      left: -1px;
+      border-top: 2px solid #38bdf8;
+      border-left: 2px solid #38bdf8;
+    }
+    .stellarium-box::after {
+      bottom: -1px;
+      right: -1px;
+      border-bottom: 2px solid #38bdf8;
+      border-right: 2px solid #38bdf8;
+    }
+    .stellarium-btn {
+      background: rgba(15, 23, 38, 0.82);
+      border: 1px solid rgba(100, 150, 200, 0.28);
+      color: #cbd5e1;
+      transition: all 0.15s ease;
+    }
+    .stellarium-btn:hover {
+      background: rgba(28, 45, 72, 0.9);
+      border-color: rgba(56, 189, 248, 0.7);
+      color: #ffffff;
+    }
+    .stellarium-btn-active {
+      background: rgba(14, 116, 144, 0.55);
+      border: 1px solid #38bdf8;
+      color: #7dd3fc;
+      box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+    .stellarium-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      border-bottom: 1px dotted rgba(100, 150, 200, 0.2);
+      padding: 4px 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11px;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(6, 8, 20, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.35);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(251, 191, 36, 0.65);
+    }
+  </style>
+</head>
+<body class="min-h-screen selection:bg-amber-400 selection:text-slate-950">
+
+  <header class="sticky top-0 z-50 bg-[#060814]/90 backdrop-blur-md border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center font-display font-bold text-slate-950 text-lg shadow-md shadow-amber-500/20">H</div>
+        <div>
+          <span class="font-display font-bold text-white tracking-wide">HANANteam</span>
+        </div>
+      </div>
+
+      <nav class="hidden lg:flex items-center gap-5 text-sm text-slate-300">
+        <a href="#experiencia" class="hover:text-amber-400 transition">Escenario Interactivo</a>
+        <a href="#vision" class="hover:text-amber-400 transition">Nuestra Visión</a>
+        <a href="#desafio" class="hover:text-amber-400 transition">El Desafío</a>
+        <a href="#especial" class="hover:text-amber-400 transition">Lo Especial</a>
+        <a href="#inventario-completo" class="hover:text-amber-400 transition">20 Misiones NASA</a>
+        <a href="#equipo" class="hover:text-amber-400 transition">Equipo</a>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <button onclick="startStorybook()" class="px-3.5 py-2 rounded-full bg-orange-600 hover:bg-orange-500 text-white font-semibold text-xs transition flex items-center gap-1.5 shadow-lg shadow-orange-600/30">
+          <span>📖 Iniciar Cuento</span>
+        </button>
+        <button onclick="openStellariumMode('solar')" class="px-3.5 py-2 rounded-full bg-sky-600/90 hover:bg-sky-500 text-white font-semibold text-xs transition flex items-center gap-1.5 shadow-lg shadow-sky-600/30 border border-sky-400/40">
+          <span>🪐 Planetario 3D / 2D</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <section class="pt-10 pb-6 px-6 text-center max-w-4xl mx-auto">
+    <h1 class="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-white tracking-tight mb-3">
+      A Space Relic's Tale <span class="text-amber-400">| Ecos en el Polvo</span>
+    </h1>
+    <p class="text-xs md:text-sm text-slate-300 max-w-2xl mx-auto">
+      Una experiencia inmersiva creada por <strong>HANANspace</strong> que fusiona un <strong>cuento interactivo narrado por voz</strong> con un <strong>Planetario 3D y Mapa Cartográfico 2D</strong>.
+    </p>
+  </section>
+
+  <section id="experiencia" class="py-4 px-3 md:px-6 max-w-7xl mx-auto">
+
+    <div class="mb-3 bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-2.5 flex flex-wrap items-center justify-between gap-2 shadow-xl">
+      <div class="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800">
+        <button id="mode-btn-story" onclick="switchMainMode('story')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-amber-400 text-slate-950 shadow">
+          <span>📖 Cuento Interactivo</span>
+        </button>
+        <button id="mode-btn-planetarium" onclick="switchMainMode('planetarium')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-slate-300 hover:text-white">
+          <span>🪐 Planetario 3D y Mapa 2D</span>
+        </button>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 text-xs">
+        <button onclick="toggleVoice()" id="btn-voice" class="px-3 py-1.5 rounded-lg bg-amber-400 text-slate-950 font-bold flex items-center gap-1 transition">
+          🗣️ Voz: ON
+        </button>
+
+        <select id="voice-select" onchange="changeSelectedVoice(this.value)" class="bg-slate-950 text-slate-200 border border-slate-700 rounded-lg px-2 py-1.5 text-[11px] max-w-[155px] focus:outline-none focus:border-amber-400" title="Seleccionar timbre de voz en español">
+          <option value="">Voz Natural Auto</option>
+        </select>
+
+        <button onclick="toggleMusic()" id="btn-music" class="px-3 py-1.5 rounded-lg bg-indigo-500/30 text-indigo-200 border border-indigo-400/40 font-semibold flex items-center gap-1 transition">
+          🎵 Ambiente: ON
+        </button>
+
+        <div class="hidden md:flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800">
+          <span class="text-[10px] text-slate-400">Vol</span>
+          <input id="master-vol-slider" type="range" min="0" max="100" value="75" oninput="updateMasterVolume(this.value)" class="w-16 accent-amber-400 cursor-pointer" title="Volumen maestro del ambiente espacial">
+        </div>
+
+        <button onclick="toggleFullscreenStage()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition" title="Pantalla completa">
+          ⛶
+        </button>
+      </div>
+    </div>
+
+    <div id="story-stage-container" class="relative w-full h-[620px] md:h-[680px] rounded-2xl overflow-hidden border-2 border-slate-800 shadow-2xl starfield select-none">
+
+      <div id="wrapper-story-mode" class="w-full h-full relative">
+
+        <div id="view-splash" class="w-full h-full relative flex flex-col items-center justify-center p-6 text-center">
+          
+          <div class="absolute top-6 left-6 md:top-10 md:left-12 w-32 h-32 md:w-48 md:h-48 rounded-full bg-gradient-to-br from-amber-200 via-amber-400 to-orange-500 shadow-[0_0_90px_25px_rgba(251,191,36,0.45)] flex items-center justify-center float-slow">
+            <svg viewBox="0 0 120 120" class="w-24 h-24 md:w-36 md:h-36">
+              <path d="M32 55 Q42 65 52 55" stroke="#92400e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+              <path d="M68 55 Q78 65 88 55" stroke="#92400e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+              <circle cx="30" cy="68" r="8" fill="#ea580c" opacity="0.35"/>
+              <circle cx="90" cy="68" r="8" fill="#ea580c" opacity="0.35"/>
+              <path d="M50 72 Q60 80 70 72" stroke="#92400e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <div class="z-10 max-w-xl px-4 mt-8 md:mt-0">
+            <div class="inline-block mb-2">
+              <svg viewBox="0 0 260 110" class="w-52 md:w-64 mx-auto">
+                <path d="M135 15 L140 32 M162 22 L152 36 M178 42 L160 48" stroke="#fde047" stroke-width="4" stroke-linecap="round"/>
+                <path d="M120 42 Q150 38 158 65" stroke="#fde047" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                <text x="55" y="50" fill="#ea580c" class="font-story" font-size="24" font-weight="700">HANANteam</text>
+                <text x="65" y="76" fill="#f97316" class="font-story" font-size="32" font-weight="700">ecos del</text>
+                <text x="105" y="102" fill="#fb923c" class="font-story" font-size="30" font-weight="700">espacio</text>
+              </svg>
+            </div>
+
+            <p class="text-xs md:text-sm text-slate-300 leading-relaxed mb-6">
+              Una experiencia de narrativa digital y simulación planetaria 3D — <em>"Abandonados pero no olvidados: Historias sobre el equipo histórico de la NASA en la Luna, Marte y el espacio profundo"</em>.
+            </p>
+
+            <div class="flex flex-wrap items-center justify-center gap-4">
+              <button onclick="startStorybook()" class="px-6 py-3 rounded-full bg-[#c2410c] hover:bg-[#ea580c] text-amber-100 font-semibold text-sm flex items-center gap-2.5 shadow-lg shadow-orange-900/50 transition transform hover:scale-105">
+                <span>🔊 Iniciar Cuento Interactivo</span>
+                <span class="w-3 h-3 rounded-full bg-amber-300 inline-block animate-ping"></span>
+              </button>
+
+              <button onclick="openStellariumMode('solar')" class="px-5 py-3 rounded-full bg-sky-900/80 hover:bg-sky-800 text-sky-200 border border-sky-400/50 font-semibold text-sm flex items-center gap-2 shadow-lg transition transform hover:scale-105">
+                <span>🪐 Explorar Planetario 3D / 2D</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="absolute -bottom-10 right-4 md:right-10 flex flex-col items-center pointer-events-none">
+            <svg viewBox="0 0 100 130" class="w-24 h-28 md:w-28 md:h-36 -mb-6 z-10 float-slow">
+              <circle cx="50" cy="36" r="22" fill="#334155" stroke="#94a3b8" stroke-width="2"/>
+              <circle cx="48" cy="36" r="16" fill="#fde68a"/>
+              <circle cx="43" cy="34" r="2.5" fill="#1e293b"/>
+              <circle cx="53" cy="34" r="2.5" fill="#1e293b"/>
+              <path d="M45 42 Q48 45 52 42" stroke="#1e293b" stroke-width="2" fill="none"/>
+              <rect x="36" y="58" width="28" height="36" rx="10" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="2"/>
+              <rect x="42" y="65" width="16" height="10" rx="2" fill="#f59e0b"/>
+              <rect x="39" y="92" width="9" height="22" rx="4" fill="#64748b"/>
+              <rect x="52" y="92" width="9" height="22" rx="4" fill="#64748b"/>
+            </svg>
+            <div class="w-48 h-28 md:w-64 md:h-36 rounded-t-full bg-gradient-to-tr from-sky-600 via-blue-500 to-emerald-400 shadow-[0_0_50px_rgba(56,189,248,0.4)] border-t-4 border-sky-200/50 relative overflow-hidden">
+              <div class="absolute top-4 left-8 w-16 h-10 bg-emerald-300/70 rounded-full rotate-12"></div>
+              <div class="absolute top-10 right-10 w-20 h-12 bg-emerald-400/80 rounded-full -rotate-6"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="view-chapter-intro" class="hidden w-full h-full flex flex-col items-center justify-center p-8 text-center bg-[#060919]/95 transition-opacity duration-500">
+          <p id="intro-chapter-num" class="font-story text-3xl md:text-5xl text-amber-200 mb-3 tracking-wide drop-shadow-[0_2px_10px_rgba(251,191,36,0.3)]">
+            Capítulo 1:
+          </p>
+          <h3 id="intro-chapter-title" class="font-story text-2xl md:text-5xl text-amber-100 max-w-2xl leading-snug drop-shadow-[0_2px_10px_rgba(251,191,36,0.3)]">
+            El Águila y el Espejo que Aún Responde
+          </h3>
+          <p id="intro-chapter-sub" class="text-sm text-sky-300/90 mt-4 font-mono"></p>
+          <button onclick="skipChapterIntro()" class="mt-8 px-4 py-1.5 rounded-full bg-slate-800/80 hover:bg-slate-700 text-xs text-slate-300 border border-slate-700">
+            Entrar a la escena →
+          </button>
+        </div>
+
+        <div id="view-scene" class="hidden w-full h-full relative flex flex-col justify-between p-4 md:p-6">
+
+          <div class="text-center z-20 pointer-events-none pt-1">
+            <p id="scene-chapter-num" class="font-story text-sm md:text-base text-amber-200 leading-tight">Capítulo 1:</p>
+            <h4 id="scene-chapter-title" class="font-story text-base md:text-xl text-amber-100 leading-tight">El Águila y el Espejo Eterno</h4>
+            <p id="scene-soundscape-badge" class="text-[11px] font-mono text-sky-300/90 mt-0.5">🎧 Paisaje Sonoro: Pulso Láser Lunar + Telemetría Quindar</p>
+          </div>
+
+          <button onclick="openNasaInfoModal()" class="absolute top-4 left-4 md:top-5 md:left-5 z-30 flex flex-col items-center group focus:outline-none">
+            <span class="font-story text-xs text-amber-100 mb-1 group-hover:text-amber-300 transition">¡Haz clic aquí</span>
+            <div class="w-14 h-14 md:w-18 md:h-18 rounded-full p-1 bg-gradient-to-b from-amber-300 to-orange-500 shadow-[0_0_25px_rgba(251,191,36,0.6)] group-hover:scale-110 transition relative">
+              <div class="w-full h-full rounded-full bg-slate-900 flex items-center justify-center overflow-hidden">
+                <svg viewBox="0 0 80 80" class="w-12 h-12 md:w-14 md:h-14">
+                  <circle cx="40" cy="30" r="14" fill="#fde68a"/>
+                  <path d="M24 28 Q40 12 56 28" fill="#475569"/>
+                  <circle cx="35" cy="30" r="2" fill="#1e293b"/>
+                  <circle cx="45" cy="30" r="2" fill="#1e293b"/>
+                  <path d="M36 36 Q40 40 44 36" stroke="#1e293b" stroke-width="2" fill="none"/>
+                  <path d="M22 58 L16 42 M58 58 L64 42" stroke="#fde68a" stroke-width="4" stroke-linecap="round"/>
+                  <rect x="27" y="45" width="26" height="26" rx="8" fill="#f8fafc"/>
+                </svg>
+              </div>
+              <span class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-blue-600 text-white text-[11px] font-bold flex items-center justify-center border-2 border-slate-950">i</span>
+            </div>
+            <span class="font-story text-[10px] md:text-xs text-amber-100 mt-1 leading-tight max-w-[105px] text-center group-hover:text-amber-300">para datos reales de la NASA!</span>
+          </button>
+
+          <button onclick="locateCurrentChapterInPlanetarium()" class="absolute top-4 right-4 md:top-5 md:right-5 z-30 stellarium-box px-3 py-2 rounded-xl text-left group hover:border-sky-400 transition">
+            <div class="text-[9px] font-mono uppercase tracking-wider text-sky-400">Mapa interactivo 3D/2D</div>
+            <div class="text-xs font-bold text-white flex items-center gap-1.5 group-hover:text-sky-300">
+              <span>🪐 Ubicar en el Planetario</span>
+              <span>→</span>
+            </div>
+          </button>
+
+          <div class="relative flex-1 flex flex-col md:flex-row items-center justify-between px-4 md:px-12 my-1">
+            
+            <div class="absolute inset-0 pointer-events-none overflow-hidden opacity-75">
+              <div class="falling-ray" style="left: 45%; animation-delay: 0s;"></div>
+              <div class="falling-ray" style="left: 54%; animation-delay: 1.1s;"></div>
+              <div class="falling-ray" style="left: 62%; animation-delay: 0.5s;"></div>
+              <div class="falling-ray" style="left: 71%; animation-delay: 1.8s;"></div>
+              <div class="falling-ray" style="left: 78%; animation-delay: 2.4s;"></div>
+            </div>
+
+            <div id="scene-illustration" class="w-44 h-44 md:w-68 md:h-68 flex items-center justify-center z-10 float-slow mx-auto md:mx-0 md:ml-14"></div>
+
+            <div class="z-20 w-full md:w-6/12 flex flex-col items-end space-y-2.5">
+              <div id="dialogue-box" class="dialogue-pop bg-[#0284c7]/95 hover:bg-[#0369a1] text-white px-5 py-4 rounded-2xl shadow-[0_10px_30px_rgba(2,132,199,0.45)] border border-sky-300/40 max-w-lg w-full transition">
+                <div class="flex items-center justify-between text-[11px] uppercase tracking-wider text-sky-200 font-semibold mb-1.5">
+                  <span id="dialogue-speaker">🔊 Módulo Lunar Eagle (Apolo 11)</span>
+                  <span id="dialogue-step-indicator" class="px-2 py-0.5 rounded-full bg-slate-950/40">1 / 4</span>
+                </div>
+                <p id="dialogue-text" class="text-sm md:text-lg font-semibold leading-relaxed">
+                  "Hola, terrícola. Soy Eagle, el módulo lunar del Apolo 11."
+                </p>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-end gap-2">
+                <button onclick="prevDialogue()" id="btn-prev-line" class="px-3 py-2 rounded-lg bg-slate-900/90 hover:bg-slate-800 text-slate-300 text-xs font-semibold border border-slate-700 transition">
+                  ← Anterior
+                </button>
+                <button onclick="replayCurrentVoice()" class="px-3 py-2 rounded-lg bg-slate-900/90 hover:bg-slate-800 text-amber-300 text-xs font-semibold border border-slate-700 transition">
+                  🔁 Escuchar frase
+                </button>
+                <button onclick="triggerChapterSFXManual()" class="px-3 py-2 rounded-lg bg-slate-900/90 hover:bg-slate-800 text-sky-300 text-xs font-semibold border border-slate-700 transition" title="Escuchar sonido físico real de esta misión">
+                  🔊 Sonido Real
+                </button>
+                <button onclick="nextDialogue()" id="btn-next-line" class="px-4 py-2 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs md:text-sm font-bold shadow-md shadow-amber-500/20 transition">
+                  Siguiente frase →
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="z-20 bg-slate-950/85 backdrop-blur-md rounded-xl p-2.5 border border-slate-800 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex flex-wrap items-center gap-1.5" id="chapter-pills"></div>
+            <div class="flex items-center gap-2">
+              <button onclick="locateCurrentChapterInPlanetarium()" class="text-xs font-semibold text-sky-300 hover:text-sky-200 px-3 py-1.5 rounded-lg bg-sky-500/15 border border-sky-400/30">
+                🪐 Ver en el mapa 3D / 2D
+              </button>
+              <button onclick="openNasaInfoModal()" class="text-xs font-semibold text-amber-300 hover:text-amber-200 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-400/30">
+                📋 Ficha Técnica de la NASA
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div id="wrapper-planetarium-mode" class="hidden w-full h-full relative bg-[#03060c] overflow-hidden">
+
+        <div id="canvas-3d-container" class="absolute inset-0 z-0 cursor-grab active:cursor-grabbing"></div>
+
+        <div id="canvas-2d-container" class="absolute inset-0 z-0 hidden bg-[#050811] cursor-move">
+          <canvas id="map-2d-canvas" class="w-full h-full block"></canvas>
+        </div>
+
+        <div class="absolute top-3 left-3 right-3 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+          <div class="stellarium-box px-3.5 py-1.5 pointer-events-auto">
+            <h3 id="ui-app-title" class="text-xs md:text-sm font-bold tracking-wider text-white uppercase">ECOS DEL SISTEMA SOLAR (20 MISIONES)</h3>
+          </div>
+
+          <div class="stellarium-box p-1 flex flex-wrap items-center gap-1 pointer-events-auto">
+            <button onclick="switchScene('solar')" id="btn-solar" class="stellarium-btn stellarium-btn-active px-2.5 py-1 text-xs font-mono">
+              <span id="ui-nav-solar">El Sistema Solar (8)</span>
+            </button>
+            <button onclick="switchScene('moon')" id="btn-moon" class="stellarium-btn px-2.5 py-1 text-xs font-mono flex items-center gap-1">
+              <span id="ui-nav-moon">La Luna</span>
+              <span id="count-moon" class="px-1 text-[10px] bg-slate-900 text-sky-400 border border-sky-500/30">4</span>
+            </button>
+            <button onclick="switchScene('mars')" id="btn-mars" class="stellarium-btn px-2.5 py-1 text-xs font-mono flex items-center gap-1">
+              <span id="ui-nav-mars">Marte</span>
+              <span id="count-mars" class="px-1 text-[10px] bg-slate-900 text-amber-400 border border-amber-500/30">12</span>
+            </button>
+
+            <div id="view-mode-group" class="hidden items-center gap-1 pl-2 ml-1 border-l border-slate-700">
+              <button onclick="setDimension('3d')" id="btn-dim-3d" class="stellarium-btn stellarium-btn-active px-2 py-1 text-xs font-mono">3D Globo</button>
+              <button onclick="setDimension('2d')" id="btn-dim-2d" class="stellarium-btn px-2 py-1 text-xs font-mono">2D Mapa</button>
+            </div>
+
+            <button onclick="toggleSettings()" class="stellarium-btn px-2 py-1 text-xs font-mono ml-1">
+              ⚙ <span id="ui-btn-settings">Ajustes</span>
+            </button>
+          </div>
+        </div>
+
+        <aside class="absolute top-16 left-3 z-20 w-68 md:w-72 max-w-[85vw] stellarium-box pointer-events-auto">
+          <div class="px-3 py-2 flex items-center justify-between border-b border-sky-500/20 cursor-pointer bg-slate-950/50" onclick="toggleSection('radar-body', 'radar-arrow')">
+            <div>
+              <div class="text-[11px] font-mono font-bold tracking-wider uppercase text-sky-400" id="ui-radar-title">CATÁLOGO DE OBJETOS</div>
+              <div id="ui-radar-subtitle" class="text-[10px] font-mono text-slate-400">20 artefactos registrados</div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="event.stopPropagation(); resetCamera();" id="ui-btn-center" class="stellarium-btn px-2 py-0.5 text-[10px] font-mono">Centrar</button>
+              <span id="radar-arrow" class="text-sky-400 text-xs font-mono">▼</span>
+            </div>
+          </div>
+
+          <div id="radar-body" class="p-2 max-h-[420px] overflow-y-auto space-y-1.5">
+            <div id="solar-hint" class="p-2 text-[10px] font-mono text-amber-300/90 bg-amber-950/30 border border-amber-500/30">
+              Haz clic en La Luna, Marte o cualquier misión del catálogo para inspeccionar su telemetría.
+            </div>
+            <div id="artifact-list" class="space-y-1.5"></div>
+          </div>
+        </aside>
+
+        <aside id="detail-panel" class="absolute top-16 right-3 z-20 w-80 md:w-96 max-w-[92vw] stellarium-box pointer-events-auto hidden">
+          <div class="px-3.5 py-2.5 border-b border-sky-500/25 bg-slate-950/70 flex items-start justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <span id="detail-badge" class="px-1.5 py-0.5 text-[10px] font-mono uppercase bg-sky-500/20 text-sky-300 border border-sky-400/40">LUNA</span>
+                <span id="detail-nssdca" class="text-[10px] font-mono text-amber-300">NSSDCA: --</span>
+              </div>
+              <h3 id="detail-title" class="text-xs md:text-sm font-bold font-mono text-white mt-1 uppercase tracking-wide">--</h3>
+              <p id="detail-coords" class="text-[11px] font-mono text-sky-400 mt-0.5">--</p>
+            </div>
+            <div class="flex items-center gap-1">
+              <button onclick="toggleSection('detail-body', 'detail-arrow')" class="stellarium-btn px-1.5 py-0.5 text-xs font-mono">
+                <span id="detail-arrow">▼</span>
+              </button>
+              <button onclick="closeDetail()" class="stellarium-btn px-1.5 py-0.5 text-xs font-mono">✕</button>
+            </div>
+          </div>
+
+          <div id="detail-body" class="p-3 space-y-2.5 max-h-[430px] overflow-y-auto">
+            <div class="grid grid-cols-2 gap-1 bg-slate-950/80 p-1 border border-slate-800">
+              <button onclick="setInfoTab('basic')" id="tab-basic" class="stellarium-btn stellarium-btn-active py-1 text-[11px] font-mono font-semibold">
+                Información Básica
+              </button>
+              <button onclick="setInfoTab('detailed')" id="tab-detailed" class="stellarium-btn py-1 text-[11px] font-mono font-semibold">
+                Información Detallada
+              </button>
+            </div>
+
+            <div id="info-basic-view" class="space-y-2 text-xs leading-relaxed">
+              <div class="p-2.5 bg-slate-950/60 border border-slate-800/90">
+                <div class="text-[10px] font-mono uppercase text-sky-400 mb-1" id="ui-objectives-header">🎯 Objetivos de la Misión</div>
+                <p id="detail-objectives" class="text-slate-200"></p>
+              </div>
+              <div class="p-2.5 bg-slate-950/60 border border-slate-800/90">
+                <div class="text-[10px] font-mono uppercase text-emerald-400 mb-1" id="ui-story-header">🚀 Desarrollo y Resultados</div>
+                <p id="detail-story" class="text-slate-200"></p>
+              </div>
+              <div class="p-2.5 bg-slate-950/60 border border-slate-800/90">
+                <div class="text-[10px] font-mono uppercase text-amber-400 mb-1" id="ui-science-header">✨ Datos Curiosos y Récords</div>
+                <p id="detail-science" class="text-slate-300"></p>
+              </div>
+            </div>
+
+            <div id="info-detailed-view" class="hidden space-y-2">
+              <div class="p-2.5 bg-slate-950/75 border border-sky-500/20">
+                <div class="text-[10px] font-mono uppercase text-sky-400 mb-1.5">Telemetría y Parámetros Técnicos (NASA NSSDCA)</div>
+                <div class="stellarium-row"><span class="text-slate-400">ID NSSDCA:</span><span id="tech-nssdca" class="text-white text-right">--</span></div>
+                <div class="stellarium-row"><span class="text-slate-400">Inicio y Fin:</span><span id="tech-date" class="text-white text-right">--</span></div>
+                <div class="stellarium-row"><span class="text-slate-400">Masa / Diseño:</span><span id="tech-mass" class="text-white text-right">--</span></div>
+                <div class="stellarium-row"><span class="text-slate-400">Energía:</span><span id="tech-power" class="text-white text-right">--</span></div>
+                <div class="stellarium-row"><span class="text-slate-400">Ubicación / Estado:</span><span id="tech-status" class="text-amber-300 text-right">--</span></div>
+                <div class="stellarium-row"><span class="text-slate-400">Coordenadas:</span><span id="tech-coords" class="text-sky-300 text-right">--</span></div>
+              </div>
+              <div class="p-2.5 bg-slate-950/75 border border-slate-800">
+                <div class="text-[10px] font-mono uppercase text-sky-400 mb-1">Instrumentación Científica</div>
+                <p id="tech-instruments" class="text-[11px] font-mono text-slate-300 leading-relaxed"></p>
+              </div>
+            </div>
+
+            <div class="pt-1 flex flex-wrap gap-1.5">
+              <button onclick="narrateSelectedArtifact()" class="flex-1 stellarium-btn px-2.5 py-1.5 text-[11px] font-mono text-amber-300 border-amber-400/40 flex items-center justify-center gap-1">
+                🔊 Escuchar Info
+              </button>
+              <button onclick="jumpFromArtifactToStoryChapter()" class="flex-1 stellarium-btn stellarium-btn-active px-2.5 py-1.5 text-[11px] font-mono flex items-center justify-center gap-1">
+                📖 Ver en Cuento
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <div class="absolute bottom-3 left-3 right-3 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+          <div class="stellarium-box px-3 py-1.5 pointer-events-auto flex flex-wrap items-center gap-2.5">
+            <span class="text-[10px] font-mono text-sky-400 uppercase" id="ui-controls-title">BARRA STELLARIUM</span>
+            <button onclick="toggleAutoRotate()" id="btn-rotate" class="stellarium-btn stellarium-btn-active px-2 py-0.5 text-[10px] font-mono">Órbita/Giro: ON</button>
+            <button onclick="toggleOrbits()" id="btn-orbits" class="stellarium-btn stellarium-btn-active px-2 py-0.5 text-[10px] font-mono">Órbitas: ON</button>
+            <span id="cursor-coords" class="text-[11px] font-mono text-slate-300 pl-2 border-l border-slate-700">Lat: 0.6742° | Lon: 23.4731°</span>
+          </div>
+
+          <div class="stellarium-box px-3 py-1.5 pointer-events-auto flex items-center gap-3 text-[10px] font-mono text-slate-300">
+            <span>NASA WAC Visible • NSSDCA</span>
+            <button onclick="switchMainMode('story')" class="text-amber-300 hover:underline font-bold">← Volver al Cuento</button>
+          </div>
+        </div>
+
+        <div id="settings-modal" class="absolute inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
+          <div class="stellarium-box w-full max-w-md p-5">
+            <div class="flex items-center justify-between pb-2.5 border-b border-sky-500/25">
+              <h3 id="ui-settings-title" class="text-sm font-mono font-bold text-sky-400 uppercase">⚙ Configuración del Planetario</h3>
+              <button onclick="toggleSettings()" class="stellarium-btn px-2 py-0.5 text-xs font-mono">✕</button>
+            </div>
+
+            <div class="mt-4 space-y-4 text-xs font-mono">
+              <div class="flex items-center justify-between">
+                <span id="ui-set-lang" class="text-slate-300">Idioma / Language</span>
+                <div class="flex gap-1">
+                  <button onclick="setLanguage('es')" id="lang-es" class="stellarium-btn stellarium-btn-active px-3 py-1">ES</button>
+                  <button onclick="setLanguage('en')" id="lang-en" class="stellarium-btn px-3 py-1">EN</button>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span id="ui-set-vol" class="text-slate-300">Volumen de Telemetría y Ambiente</span>
+                  <span id="vol-label" class="text-sky-400">75%</span>
+                </div>
+                <input type="range" min="0" max="100" value="75" oninput="updateMasterVolume(this.value)" class="w-full accent-sky-400 cursor-pointer">
+              </div>
+
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span id="ui-set-speed" class="text-slate-300">Velocidad Orbital / Giro</span>
+                  <span id="speed-label" class="text-sky-400">1.0x</span>
+                </div>
+                <input type="range" min="0" max="30" value="10" oninput="updateSpeed(this.value)" class="w-full accent-sky-400 cursor-pointer">
+              </div>
+            </div>
+
+            <div class="mt-5 flex justify-end">
+              <button onclick="toggleSettings()" id="ui-set-close" class="stellarium-btn stellarium-btn-active px-4 py-1.5 text-xs font-mono">Aplicar y Cerrar</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="nasa-info-modal" class="hidden absolute inset-0 z-50 bg-slate-950/90 backdrop-blur-md p-4 md:p-8 overflow-y-auto flex items-center justify-center">
+        <div class="bg-slate-900 border-2 border-amber-400/50 rounded-2xl max-w-2xl w-full p-6 md:p-8 relative shadow-2xl">
+          <button onclick="closeNasaInfoModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold">✕</button>
+          <div id="nasa-info-content"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="vision" class="py-16 px-6 max-w-4xl mx-auto text-center">
+    <span class="text-xs uppercase tracking-widest text-amber-400 font-semibold">Nuestra Visión</span>
+    <blockquote class="text-2xl md:text-3xl font-story text-white mt-3 mb-5 leading-snug">
+      "La historia contada en 'Ecos en el Polvo' es la historia que nos hubiera encantado escuchar de niños: una donde las naves que la humanidad dejó en otros mundos cobran voz propia y pueden explorarse en un planetario 3D interactivo."
+    </blockquote>
+    <p class="text-slate-300 leading-relaxed">
+      Este proyecto nutre la curiosidad natural de la infancia y la juventud desde diferentes ángulos. Nuestra experiencia une <strong>física y cartografía planetaria 3D/2D, narrativa con voz natural e historia de la exploración espacial</strong>: tres fuentes poderosas de conocimiento que nos ayudan a entender el sistema solar y conectar con nuestra humanidad.
+    </p>
+  </section>
+
+  <section id="desafio" class="py-14 px-6 bg-slate-900/50 border-y border-slate-800/80">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 items-center">
+      <div>
+        <h2 class="text-3xl font-display font-bold text-white mt-2 mb-4">Abandonados pero no Olvidados</h2>
+        <p class="text-slate-300 leading-relaxed mb-4">
+          Contar la historia del equipo histórico que la NASA dejó atrás en la Luna, Marte y el espacio profundo desde la década de 1960. El reto nos pedía crear una herramienta educativa enfocada en jóvenes que transformara los catálogos técnicos de la NASA en narrativas memorables.
+        </p>
+        <p class="text-slate-300 leading-relaxed">
+          Con <strong>HANANteam</strong>, cada módulo lunar, rover marciano y sonda interplanetaria narra en primera persona cómo aterrizó, qué descubrió y en qué coordenadas exactas descansa hoy dentro de nuestro visor <strong>Stellarium 3D/2D</strong>.
+        </p>
+      </div>
+      <div class="bg-slate-900/90 p-6 rounded-2xl border border-slate-800 space-y-3 text-sm">
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+          <strong class="text-amber-400 block">🌕 En la Luna (Surveyor 3, Apolo 11, Apolo 12 y Apolo 15):</strong>
+          <span class="text-slate-300">La estructura trípode de Surveyor 3 en el Océano de las Tormentas, las etapas de descenso de Eagle, Intrepid y Falcon, estaciones nucleares ALSEP, el primer Rover Lunar (LRV) y el espejo láser LRRR que sigue funcionando hoy.</span>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+          <strong class="text-orange-400 block">🔴 En Marte (Mariner 4/6/7/9, Viking 1/2, Pathfinder, Spirit, Opportunity, Curiosity, InSight, Perseverance e Ingenuity):</strong>
+          <span class="text-slate-300">Desde los primeros sobrevuelos de Mariner 4, 6 y 7 y el primer orbitador Mariner 9, pasando por los aterrizajes de Viking 1 y 2, los airbags de Pathfinder/Sojourner y los gemelos Spirit y Opportunity, hasta Curiosity, InSight, Perseverance e Ingenuity.</span>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+          <strong class="text-sky-400 block">🌌 En Asteroides y el Espacio Profundo (NEAR, Dawn, Pioneer 10, Kepler):</strong>
+          <span class="text-slate-300">NEAR Shoemaker posada sobre el asteroide Eros, Dawn orbitando eternamente Ceres, Kepler en órbita solar tras hallar 2.600+ exoplanetas y Pioneer 10 viajando hacia Aldebarán con su placa dorada.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="especial" class="py-16 px-6 max-w-6xl mx-auto">
+    <h2 class="text-3xl font-display font-bold text-center text-white mb-10">Lo que hace especial a nuestra experiencia</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="bg-slate-900/70 p-6 rounded-2xl border border-slate-800">
+        <div class="text-3xl mb-3">🎧</div>
+        <h3 class="font-bold text-white text-lg mb-2">Audio Espacial Orgánico</h3>
+        <p class="text-sm text-slate-400">Sintetizador ambiental continuo con filtros modulados, atenuación inteligente (ducking) para la voz y acústica física real del viento de Marte, rotores y láseres lunares.</p>
+      </div>
+      <div class="bg-slate-900/70 p-6 rounded-2xl border border-slate-800">
+        <div class="text-3xl mb-3">🪐</div>
+        <h3 class="font-bold text-white text-lg mb-2">Planetario 3D + Mapa 2D</h3>
+        <p class="text-sm text-slate-400">Visor Stellarium HUD integrado con el Sistema Solar, globo 3D y mapa cartográfico equirectangular 2D de la Luna y Marte con coordenadas reales.</p>
+      </div>
+      <div class="bg-slate-900/70 p-6 rounded-2xl border border-slate-800">
+        <div class="text-3xl mb-3">🎨</div>
+        <h3 class="font-bold text-white text-lg mb-2">Cuento Interactivo Ilustrado</h3>
+        <p class="text-sm text-slate-400">6 capítulos narrados en primera persona con arte vectorial animado y puente directo entre cada relato y su ubicación astronómica.</p>
+      </div>
+      <div class="bg-slate-900/70 p-6 rounded-2xl border border-slate-800">
+        <div class="text-3xl mb-3">🛰️</div>
+        <h3 class="font-bold text-white text-lg mb-2">Telemetría Oficial NSSDCA</h3>
+        <p class="text-sm text-slate-400">Todo el contenido está respaldado directamente por los archivos de NASA Science y el catálogo maestro NSSDCA con 20 misiones documentadas.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="inventario-completo" class="py-12 px-6 max-w-7xl mx-auto border-t border-slate-800/80">
+    <div class="text-center mb-8">
+      <span class="text-xs uppercase tracking-widest text-amber-400 font-semibold">Respaldo Documental NASA Science & NSSDCA</span>
+      <h2 class="text-2xl md:text-3xl font-display font-bold text-white mt-1">Catálogo Maestro de las 20 Misiones (Cuento + Mapa 3D)</h2>
+      <p class="text-xs text-slate-400 mt-1">Haz clic en cualquier misión para escuchar su capítulo en el cuento o volar directamente a sus coordenadas en el Planetario 3D.</p>
+    </div>
+    <div id="cards-archive" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs"></div>
+  </section>
+
+  <section id="equipo" class="py-14 px-6 bg-slate-900/40 border-t border-slate-800 text-center">
+    <h2 class="text-2xl font-display font-bold text-white mb-2">Equipo HANANteam</h2>
+    <p class="text-amber-400 text-sm mb-4">Organización HANANspace</p>
+    <p class="text-xs text-slate-400 max-w-xl mx-auto">
+      Combinando narrativa interactiva y visualización en 3D y 2D para llevar la exploración espacial a aulas, bibliotecas y programas juveniles.
+    </p>
+  </section>
+
+  <script>
+    const ARTIFACTS = [
+      {
+        id: "surveyor3",
+        chapterIndex: 1,
+        body: "moon",
+        nssdca: "1967-035A",
+        lat: -3.0000,
+        lon: -23.4100,
+        date: "Lanzamiento: 17 abr 1967 | Alunizaje: 20 abr 1967 | Fin: 4 may 1967",
+        mass: "Estructura trípode (997 kg)",
+        power: "Panel Solar + Baterías Ag-Zn",
+        status: "Oceanus Procellarum (Océano de las Tormentas) a 3° S, 23.41° O",
+        instruments: "Estructura trípode (997 kg) conservada sin su cámara de TV ni pala excavadora (recuperadas por Apolo 12).",
+        es: {
+          name: "Surveyor 3",
+          objectives: "Realizar un aterrizaje suave, excavar y probar la firmeza del suelo lunar para asegurar que el peso de los futuros módulos Apolo no se hundiría.",
+          story: "Logró posarse en un pequeño cráter. Su brazo excavador demostró que el polvo lunar era como arena húmeda. Posteriormente, los astronautas del Apolo 12 desmontaron su cámara y la trajeron a la Tierra.",
+          science: "El primer y único caso de verdadera 'arqueología espacial'. ¡Aterrizó dando tres botes! Dos años y medio después de quedarse apagada, dos astronautas fueron caminando a visitarla."
+        },
+        en: {
+          name: "Surveyor 3 Lander",
+          objectives: "Perform a soft landing, trench, and test lunar soil firmness to ensure future Apollo modules would not sink.",
+          story: "Settled in a small crater in Oceanus Procellarum. Its soil scoop proved lunar dust behaved like damp sand. Apollo 12 astronauts later retrieved its TV camera.",
+          science: "First and only case of true space archaeology; bounced three times on landing and was visited by astronauts 2.5 years later."
+        }
+      },
+      {
+        id: "apollo11",
+        chapterIndex: 0,
+        body: "moon",
+        nssdca: "1969-059C",
+        lat: 0.6742,
+        lon: 23.4731,
+        date: "Lanzamiento: 16 jul 1969 | Alunizaje: 20 jul 1969 | Fin EASEP: 27 ago 1969",
+        mass: "Etapa de descenso (2.034 kg)",
+        power: "Baterías Ag-Zn / Espejo LRRR Pasivo",
+        status: "Mare Tranquillitatis (Mar de la Tranquilidad) a 0.67416° N, 23.47314° E",
+        instruments: "Etapa de descenso (2.034 kg), sismómetro pasivo, detector de polvo lunar y retrorreflector láser (LRRR).",
+        es: {
+          name: "Apolo 11 (Módulo Lunar 'Eagle' y EASEP)",
+          objectives: "Lograr el primer alunizaje tripulado de la historia, recolectar rocas y desplegar los primeros instrumentos científicos para enviar datos a la Tierra.",
+          story: "Tras un dramático descenso, los astronautas pasaron 21 horas en la Luna, caminaron 250 metros y dejaron la famosa placa: 'Vinimos en paz en nombre de toda la humanidad'.",
+          science: "¡La primera vez que la humanidad pisó la Luna! Neil y Buzz pilotaron de pie porque no había asientos. Dejaron un espejo láser que sigue reflejando rayos desde la Tierra hasta hoy, más de 55 años después."
+        },
+        en: {
+          name: "Apollo 11 ('Eagle' & EASEP)",
+          objectives: "Achieve the first crewed lunar landing, collect rocks, and deploy the first scientific instruments.",
+          story: "Astronauts spent 21 hours on the Moon, walked 250 meters, and left the plaque: 'We came in peace for all mankind'.",
+          science: "Neil and Buzz piloted standing up; their laser retroreflector still reflects laser pulses from Earth over 55 years later."
+        }
+      },
+      {
+        id: "apollo12",
+        chapterIndex: 1,
+        body: "moon",
+        nssdca: "1969-099C",
+        lat: -3.0128,
+        lon: -23.4219,
+        date: "Lanzamiento: 14 nov 1969 | Alunizaje: 19 nov 1969 | Fin ALSEP: 30 sep 1977",
+        mass: "Etapa de descenso (2.118 kg)",
+        power: "Generador de plutonio RTG (SNAP-27)",
+        status: "Oceanus Procellarum a 3.0128° S, 23.4219° O (a 180 m de Surveyor 3)",
+        instruments: "Etapa de descenso (2.118 kg), estación ALSEP con generador de plutonio (SNAP-27), sismómetro y detectores de viento solar.",
+        es: {
+          name: "Apolo 12 (Módulo 'Intrepid' y ALSEP)",
+          objectives: "Demostrar alunizajes de precisión, desplegar la primera estación científica de larga duración (ALSEP) y recuperar piezas de la Surveyor 3.",
+          story: "Las caminatas duraron casi 8 horas. Todo iba perfecto hasta que apuntaron accidentalmente la cámara de TV en vivo al Sol y la quemaron. Al marcharse, los instrumentos científicos quedaron enviando datos valiosos por casi 8 años.",
+          science: "Lograron un aterrizaje con precisión de francotirador, a solo 180 metros de la vieja sonda Surveyor 3. Además, provocaron el primer 'lunamoto' artificial al estrellar deliberadamente su nave contra la Luna."
+        },
+        en: {
+          name: "Apollo 12 ('Intrepid' & ALSEP)",
+          objectives: "Demonstrate pinpoint landings, deploy the first long-duration ALSEP station, and retrieve Surveyor 3 parts.",
+          story: "Walks lasted nearly 8 hours. The station transmitted data for nearly 8 years until September 1977.",
+          science: "Pinpoint landing just 180 meters from Surveyor 3 and triggered the first artificial moonquake."
+        }
+      },
+      {
+        id: "apollo15",
+        chapterIndex: 1,
+        body: "moon",
+        nssdca: "1971-063C",
+        lat: 26.1324,
+        lon: 3.6333,
+        date: "Lanzamiento: 26 jul 1971 | Alunizaje: 30 jul 1971 | Fin ALSEP: 30 sep 1977",
+        mass: "Etapa de descenso + Vehículo Explorador Lunar (LRV)",
+        power: "Generador RTG SNAP-27 + Baterías Ag-Zn",
+        status: "Mare Imbrium (al pie de los Montes Apeninos) a 26.13239° N, 3.63330° E",
+        instruments: "Etapa de descenso, estación ALSEP con sismómetros y magnetómetro, y Vehículo Explorador Lunar (LRV).",
+        es: {
+          name: "Apolo 15 (Módulo 'Falcon', ALSEP y LRV)",
+          objectives: "Explorar un terreno montañoso lejano al ecuador, aumentar drásticamente el área cubierta usando un vehículo y estudiar la geología profunda.",
+          story: "Condujeron casi 28 km junto a las montañas lunares. Además de traer 77 kg de rocas, demostraron frente a las cámaras la famosa teoría de Galileo dejando caer un martillo y una pluma al mismo tiempo en el vacío.",
+          science: "Estrenaron el primer 'auto' de la historia conducido fuera del planeta Tierra (el Rover Lunar). Dejaron un conmovedor homenaje: una estatuilla de aluminio en honor a todos los exploradores espaciales fallecidos."
+        },
+        en: {
+          name: "Apollo 15 ('Falcon', ALSEP & LRV)",
+          objectives: "Explore mountainous terrain, expand range using the Lunar Roving Vehicle, and study deep geology.",
+          story: "Drove nearly 28 km along the lunar mountains, collected 77 kg of rocks, and demonstrated Galileo's hammer and feather experiment.",
+          science: "Debuted the first car driven off Earth and left the aluminum 'Fallen Astronaut' memorial."
+        }
+      },
+      {
+        id: "mariner4",
+        chapterIndex: 2,
+        body: "mars",
+        nssdca: "1964-077A",
+        lat: 37.0000,
+        lon: 173.0000,
+        date: "Lanzamiento: 28 nov 1964 | Sobrevuelo: 14 jul 1965 | Última transmisión: 20 dic 1967",
+        mass: "260.8 kg (Sonda de sobrevuelo)",
+        power: "4 Paneles Solares + Batería Ag-Zn",
+        status: "Sobrevuelo de Marte a 9.844 km (1.ª imagen en 37° N, 187° O)",
+        instruments: "Sistema de cámaras de televisión, magnetómetro de helio, detector de polvo cósmico, telescopio de rayos cósmicos, cámara de ionización, detector de radiación atrapada y sonda de plasma solar.",
+        es: {
+          name: "Mariner 4",
+          objectives: "Fotografiar Marte para conocer su superficie. También buscaba probar tecnologías para llevar a cabo futuras misiones a otros planetas.",
+          story: "Mariner 4 realizó su histórico sobrevuelo y envió imágenes que mostraban una superficie llena de cráteres, muy similar a la Luna. También descubrió que Marte tenía una atmósfera extremadamente delgada.",
+          science: "Primera nave espacial en sobrevolar Marte, pasando a unos 9.844 km de su superficie."
+        },
+        en: {
+          name: "Mariner 4",
+          objectives: "Photograph Mars to know its surface and test technologies for future planetary missions.",
+          story: "Performed its historic flyby sending images of a cratered surface similar to the Moon and discovered Mars's extremely thin atmosphere.",
+          science: "First spacecraft to fly by Mars, passing at 9,844 km."
+        }
+      },
+      {
+        id: "mariner6_7",
+        chapterIndex: 2,
+        body: "mars",
+        nssdca: "1969-014A / 030A",
+        lat: -15.0000,
+        lon: 20.0000,
+        date: "Mariner 6: 24 feb 1969 – 23 dic 1970 | Mariner 7: 27 mar 1969 – 23 dic 1970",
+        mass: "411.8 kg cada sonda gemela",
+        power: "Paneles Solares",
+        status: "Sobrevuelos de Marte (30 jul y 4 ago 1969)",
+        instruments: "Cámaras fotográficas, instrumentos para estudiar la atmósfera y equipos para analizar partículas y radiación espacial.",
+        es: {
+          name: "Mariner 6 y 7 (Sondas Gemelas)",
+          objectives: "Fotografiar la superficie de Marte, estudiar su atmósfera y medir su temperatura para ayudar a los científicos a comprender mejor el planeta y preparar futuras misiones para descifrar si alguna vez hubo vida.",
+          story: "Durante el trayecto, la Mariner 7 sufrió un fallo en la batería y perdió comunicación durante siete horas, y sus cámaras fallaron antes de llegar, pero los ingenieros lograron arreglarlo desde la Tierra. Junto con la Mariner 6 enviaron 201 fotografías y descartaron los supuestos canales artificiales en Marte.",
+          science: "¡Eran prácticamente gemelas! Fueron lanzadas con solo 3 días de diferencia, transmitieron más de 200 fotografías y eran capaces de transmitir información casi 2000 veces más rápido que Mariner 4."
+        },
+        en: {
+          name: "Mariner 6 & 7 (Twin Probes)",
+          objectives: "Photograph Mars's surface, study its atmosphere, and measure temperatures to prepare future life-seeking missions.",
+          story: "Engineers recovered Mariner 7 after a 7-hour battery failure; together with Mariner 6 they sent 201 photographs and disproved artificial canals on Mars.",
+          science: "Twin probes launched 3 days apart, transmitting data nearly 2,000 times faster than Mariner 4."
+        }
+      },
+      {
+        id: "mariner9",
+        chapterIndex: 2,
+        body: "mars",
+        nssdca: "1971-051A",
+        lat: -13.9000,
+        lon: -59.2000,
+        date: "Lanzamiento: 30 may 1971 | Llegada a órbita: 14 nov 1971 | Fin: 27 oct 1972",
+        mass: "997.9 kg (Primer orbitador marciano)",
+        power: "4 Paneles Solares",
+        status: "Órbita de Marte",
+        instruments: "Dos cámaras, espectrómetro ultravioleta e infrarrojo, radiómetro infrarrojo, experimento de ocultación de radio y sistema de mecánica celeste para estudiar la gravedad y las órbitas de las lunas marcianas.",
+        es: {
+          name: "Mariner 9",
+          objectives: "Crear un mapa detallado de Marte, estudiar su atmósfera y buscar indicios de actividad volcánica. También se le encomendó explorar sus dos lunas, Fobos y Deimos, para comprender mejor los secretos del Planeta Rojo.",
+          story: "Al llegar a Marte, Mariner 9 encontró una enorme tormenta de polvo que ocultaba el planeta. Los ingenieros decidieron esperar hasta que se despejara y pudieron enviar más de 7000 fotografías. ¡Descubrió antiguos ríos, enormes volcanes y profundos cañones!, ayudando a preparar las misiones Viking.",
+          science: "Su misión gemela, Mariner 8, nunca llegó al espacio: su cohete falló apenas 365 segundos después del lanzamiento."
+        },
+        en: {
+          name: "Mariner 9",
+          objectives: "Create a detailed map of Mars, study its atmosphere, search for volcanic activity, and explore Phobos and Deimos.",
+          story: "Waited out a global dust storm to send over 7,000 photographs, discovering ancient rivers, giant volcanoes, and deep canyons.",
+          science: "Its twin mission Mariner 8 failed just 365 seconds after launch."
+        }
+      },
+      {
+        id: "viking1",
+        chapterIndex: 2,
+        body: "mars",
+        nssdca: "1975-075C",
+        lat: 22.2700,
+        lon: -47.9500,
+        date: "Lanzamiento: 20 ago / 9 sep 1975 | Aterrizaje: 20 jul 1976 | Fin: 11 abr 1980 / nov 1982",
+        mass: "576 kg (Seca en superficie)",
+        power: "2 Generadores Nucleares RTG SNAP-19",
+        status: "Chryse Planitia (22,27° N, 312,05° E)",
+        instruments: "Cámaras, brazo robótico para recoger muestras, instrumentos de análisis químico y biológico, estación meteorológica y sismómetro.",
+        es: {
+          name: "Viking 1",
+          objectives: "Conocer Marte desde el espacio y desde su superficie. Debía fotografiar el planeta, estudiar su atmósfera y analizar su suelo para descubrir si existían señales de vida.",
+          story: "Después de casi un año de viaje, Viking 1 llegó a Marte y comenzó a buscar un lugar seguro para aterrizar. El 20 de julio de 1976, su módulo descendió y comenzó a explorar el terreno. Analizó muestras del suelo y realizó experimentos para buscar vida, pero no encontró pruebas definitivas.",
+          science: "Primer módulo de aterrizaje estadounidense en transmitir imágenes desde la superficie marciana."
+        },
+        en: {
+          name: "Viking 1 Lander",
+          objectives: "Study Mars from space and surface, photograph the planet, study its atmosphere, and analyze soil for signs of life.",
+          story: "Landed on July 20, 1976, exploring the terrain, analyzing soil samples, and conducting biological experiments.",
+          science: "First US lander to transmit images from the Martian surface."
+        }
+      },
+      {
+        id: "viking2",
+        chapterIndex: 2,
+        body: "mars",
+        nssdca: "1975-083C",
+        lat: 47.6400,
+        lon: 134.2900,
+        date: "Lanzamiento: 9 sep 1975 | Aterrizaje: 3 sep 1976 | Fin: 11 abr 1980 / 13 nov 1982",
+        mass: "576 kg (Seca en superficie)",
+        power: "2 Generadores Nucleares RTG SNAP-19",
+        status: "Utopia Planitia (47,64° N, 134,29° E)",
+        instruments: "Cámaras, brazo robótico para recoger muestras, instrumentos de análisis químico y biológico, estación meteorológica y sismómetro.",
+        es: {
+          name: "Viking 2",
+          objectives: "(Continuar el trabajo de su hermana Viking 1) Conocer Marte desde el espacio y desde su superficie. Debía fotografiar el planeta, estudiar su atmósfera y analizar su suelo para descubrir si existían señales de vida.",
+          story: "Descendió a la superficie marciana y comenzó a estudiar su nuevo hogar. Analizó el suelo, midió las temperaturas y observó los cambios del clima marciano. Al igual que Viking 1, realizó experimentos para buscar vida, pero no encontró pruebas definitivas.",
+          science: "Segunda nave de la misión Viking y tenía el mismo diseño que Viking 1. Su orbitador completó más de 700 vueltas."
+        },
+        en: {
+          name: "Viking 2 Lander",
+          objectives: "Continue Viking 1's work studying Mars from space and surface to search for signs of life.",
+          story: "Analyzed soil, measured temperatures, and observed Martian climate changes without finding definitive proof of life.",
+          science: "Second Viking spacecraft with the same design as Viking 1; its orbiter completed over 700 revolutions."
+        }
+      },
+      {
+        id: "pathfinder",
+        chapterIndex: 2,
+        body: "mars",
+        nssdca: "1996-068A",
+        lat: 19.1300,
+        lon: -33.2200,
+        date: "Lanzamiento: 4 dic 1996 | Aterrizaje: 4 jul 1997 | Fin de misión: 27 sep 1997",
+        mass: "360 kg (Lander) + 10.6 kg (Rover Sojourner)",
+        power: "Paneles Solares GaAs + Baterías",
+        status: "Ares Vallis (19,13° N, 33,22° O)",
+        instruments: "Cámaras, espectrómetro de rayos X Alpha Proton X-ray Spectrometer (APXS), estación meteorológica y sensores atmosféricos.",
+        es: {
+          name: "Mars Pathfinder / Sojourner",
+          objectives: "Demostrar que era posible aterrizar de forma económica y segura en Marte y utilizar un pequeño vehículo robótico para explorar sus rocas y su terreno.",
+          story: "¡Aterrizar en Marte nunca había sido tan peculiar! Pathfinder rebotó sobre la superficie protegido por enormes airbags hasta detenerse. Después, desplegó a Sojourner, un pequeño rover que comenzó a investigar las rocas cercanas. Aunque tuvo problemas de comunicación y finalmente perdió contacto con la Tierra, la misión fue un éxito.",
+          science: "Primera misión en utilizar airbags para aterrizar en Marte. Su misión estaba prevista para durar una semana, pero operó durante casi tres meses."
+        },
+        en: {
+          name: "Mars Pathfinder / Sojourner",
+          objectives: "Demonstrate a low-cost, safe landing on Mars and use a small robotic rover to explore rocks and terrain.",
+          story: "Bounced on the surface protected by giant airbags before deploying Sojourner to investigate nearby rocks.",
+          science: "First mission to use airbags to land on Mars; planned for one week, operated for nearly three months."
+        }
+      },
+      {
+        id: "spirit",
+        chapterIndex: 3,
+        body: "mars",
+        nssdca: "2003-027A",
+        lat: -14.5700,
+        lon: 175.4700,
+        date: "Lanzamiento: 10 jun 2003 | Aterrizaje: 3 ene 2004 | Fin de misión: 22 mar 2010",
+        mass: "185 kg",
+        power: "Paneles Solares + Baterías Li-Ion",
+        status: "Cráter Gusev (14,57° S, 175,47° E)",
+        instruments: "Cámaras panorámicas y microscópicas, espectrómetros, sensores magnéticos y herramienta para desgastar rocas.",
+        es: {
+          name: "Rover Spirit (MER-A)",
+          objectives: "Explorar diferentes regiones de Marte para descubrir si alguna vez existió agua líquida y si el planeta tuvo condiciones adecuadas para la vida.",
+          story: "Spirit y Opportunity llegaron a Marte con una misión de apenas 90 días, pero terminaron explorando durante años. Spirit encontró rocas y minerales que demostraban que Marte había sido mucho más húmedo en el pasado, sugiriendo la existencia de condiciones favorables para la vida.",
+          science: "Robots gemelos enviados a lados opuestos de Marte. Su misión estaba diseñada para durar solamente 90 días marcianos, pero Spirit trabajó durante más de seis años."
+        },
+        en: {
+          name: "Spirit Rover (MER-A)",
+          objectives: "Explore different regions of Mars to discover if liquid water and habitable conditions ever existed.",
+          story: "Found rocks and minerals in Gusev Crater proving Mars had been much wetter in the past.",
+          science: "Twin robot sent to the opposite side of Mars from Opportunity; designed for 90 sols, worked for over six years."
+        }
+      },
+      {
+        id: "opportunity",
+        chapterIndex: 3,
+        body: "mars",
+        nssdca: "2003-032A",
+        lat: -1.9500,
+        lon: 354.4700,
+        date: "Lanzamiento: 7 jul 2003 | Aterrizaje: 25 ene 2004 | Fin de misión: 13 feb 2019",
+        mass: "185 kg",
+        power: "Paneles Solares + Baterías Li-Ion",
+        status: "Meridiani Planum (1,95° S, 354,47° E)",
+        instruments: "Cámaras panorámicas y microscópicas, espectrómetros, sensores magnéticos y herramienta para desgastar rocas.",
+        es: {
+          name: "Rover Opportunity (MER-B)",
+          objectives: "Explorar diferentes regiones de Marte para descubrir si alguna vez existió agua líquida y si el planeta tuvo condiciones adecuadas para la vida.",
+          story: "Llegó a Marte con una misión de apenas 90 días y terminó explorando durante casi 15 años. Opportunity descubrió evidencias de antiguos ambientes con agua líquida y recorrió distancias sorprendentes de más de 45 kilómetros.",
+          science: "Operó durante casi 15 años tras ser diseñado para solo 90 días marcianos. Dejó de comunicarse durante una enorme tormenta de polvo que cubrió sus paneles solares."
+        },
+        en: {
+          name: "Opportunity Rover (MER-B)",
+          objectives: "Explore Mars to discover if liquid water and suitable conditions for life ever existed.",
+          story: "Discovered evidence of ancient liquid water environments and drove over 45 km.",
+          science: "Operated for nearly 15 years before a massive dust storm covered its solar panels."
+        }
+      },
+      {
+        id: "curiosity",
+        chapterIndex: 3,
+        body: "mars",
+        nssdca: "2011-070A",
+        lat: -4.5900,
+        lon: 137.4400,
+        date: "Lanzamiento: 26 nov 2011 | Aterrizaje: 6 ago 2012 | Fin de misión: continúa operativa (nov 2026)",
+        mass: "899 kg (Tamaño de un automóvil)",
+        power: "Generador Nuclear MMRTG",
+        status: "Misión Activa en Cráter Gale (4,59° S, 137,44° E)",
+        instruments: "Cámaras, láser ChemCam, laboratorio químico SAM, espectrómetros, taladro para rocas y estación meteorológica.",
+        es: {
+          name: "Curiosity (Mars Science Laboratory)",
+          objectives: "Investigar si Marte tuvo alguna vez las condiciones necesarias para albergar vida microscópica. Para ello, debía estudiar sus rocas, suelo, atmósfera y las huellas de antiguos ambientes con agua.",
+          story: "Curiosity tuvo que atravesar la atmósfera y descender suspendido por una 'grúa voladora' que lo depositó cuidadosamente sobre el suelo. Una vez allí, comenzó a explorar el cráter Gale y encontró evidencias de antiguos ríos y lagos, además de sustancias químicas y minerales que indican que microorganismos podrían haber sobrevivido.",
+          science: "Es aproximadamente del tamaño de un automóvil y ha demostrado que el planeta rojo pudo ser mucho más parecido a la Tierra de lo que imaginábamos."
+        },
+        en: {
+          name: "Curiosity Rover (MSL)",
+          objectives: "Investigate whether Mars ever had conditions necessary to support microbial life by studying its rocks, soil, and atmosphere.",
+          story: "Lowered by a sky crane into Gale Crater, finding evidence of ancient rivers, lakes, and chemical building blocks for life.",
+          science: "Car-sized rover still active in November 2026."
+        }
+      },
+      {
+        id: "insight",
+        chapterIndex: 3,
+        body: "mars",
+        nssdca: "2018-042A",
+        lat: 4.5024,
+        lon: 135.6234,
+        date: "Lanzamiento: 5 may 2018 | Aterrizaje: 26 nov 2018 | Fin: 15 dic 2022",
+        mass: "358 kg",
+        power: "Paneles Solares Circulares Decagonales",
+        status: "Inactivo en Elysium Planitia (4.5024° N, 135.6234° E)",
+        instruments: "Sismómetro Ultrasensible SEIS, Sonda de Flujo de Calor HP3, Experimento de Radio Ciencia RISE, Sensores de Viento TWINS.",
+        es: {
+          name: "Módulo Geofísico InSight",
+          objectives: "Estudiar la estructura interna profunda de Marte (corteza, manto y núcleo) y medir la actividad sísmica y los impactos de meteoritos.",
+          story: "Soy el médico geofísico de Marte. En Elysium Planitia coloqué mi sismómetro sobre el suelo para escuchar el corazón del planeta: grabé el sonido del viento marciano y más de 1.300 'martemotos'.",
+          science: "Midió por primera vez el tamaño del núcleo líquido marciano, el grosor de su corteza y fragmentos gigantes en su manto."
+        },
+        en: {
+          name: "InSight Mars Lander",
+          objectives: "Study the deep interior structure of Mars and measure seismic activity.",
+          story: "Placed a seismometer on Elysium Planitia to listen to the heartbeat of Mars, recording Martian wind and over 1,300 marsquakes.",
+          science: "Measured the size of Mars's liquid core, crust thickness, and mantle structure for the first time."
+        }
+      },
+      {
+        id: "perseverance",
+        chapterIndex: 4,
+        body: "mars",
+        nssdca: "2020-052A",
+        lat: 18.4400,
+        lon: 77.4500,
+        date: "Lanzamiento: 30 jul 2020 | Aterrizaje: 18 feb 2021 | Fin de misión: continúa operativa (nov 2026)",
+        mass: "1,025 kg",
+        power: "Generador Nuclear MMRTG",
+        status: "Misión Activa en Cráter Jezero (18,44° N, 77,45° E)",
+        instruments: "Cámaras Mastcam-Z, SuperCam, PIXL, SHERLOC, RIMFAX, MOXIE y sensores ambientales MEDA.",
+        es: {
+          name: "Perseverance (Mars 2020)",
+          objectives: "Buscar posibles señales de vida antigua, estudiar las rocas de Marte y recolectar muestras que podrían regresar algún día a la Tierra. También busca probar tecnologías que ayuden a futuras misiones humanas.",
+          story: "Perseverance llegó al cráter Jezero, donde existió un antiguo lago alimentado por un río. Durante los 'Siete Minutos de Terror', atravesó la atmósfera marciana, desplegó un paracaídas y descendió mediante una grúa aérea de manera totalmente autónoma. Desde entonces ha explorado el antiguo delta, estudiado rocas y recolectado muestras.",
+          science: "Llevó consigo a Ingenuity, ¡el primer helicóptero que voló en otro planeta!, y puede recoger muestras de rocas y almacenarlas en pequeños tubos para una futura misión que podría traerlas a la Tierra."
+        },
+        en: {
+          name: "Perseverance Rover (Mars 2020)",
+          objectives: "Seek signs of ancient life, study Martian rocks, collect samples for future return to Earth, and test new technologies.",
+          story: "Survived the 'Seven Minutes of Terror' to land autonomously via sky crane in Jezero Crater and explore its ancient river delta.",
+          science: "Carried Ingenuity, the first helicopter to fly on another planet, and stores rock samples in sealed tubes."
+        }
+      },
+      {
+        id: "ingenuity",
+        chapterIndex: 4,
+        body: "mars",
+        nssdca: "2020-052B",
+        lat: 18.4447,
+        lon: 77.4508,
+        date: "18 Feb 2021 (1.er vuelo: 19 Abr 2021) | Fin: 25 Ene 2024",
+        mass: "1.8 kg (0.68 kg en gravedad marciana)",
+        power: "Panel Solar Superior + 6 Baterías Li-Ion",
+        status: "Retirado en Valinor Hills, Cráter Jezero (Ene 2024)",
+        instruments: "Rotores Coaxiales de Fibra de Carbono (1,2 m, 2400 rpm), Altímetro Láser Garmin, Cámara de Navegación y Cámara a Color RTE.",
+        es: {
+          name: "Helicóptero Marciano Ingenuity",
+          objectives: "Demostrar la viabilidad del primer vuelo propulsado y controlado en la tenue atmósfera de Marte y servir como explorador aéreo para Perseverance.",
+          story: "Con solo 1,8 kg de peso logré el primer vuelo controlado y propulsado en otro planeta el 19 de abril de 2021. Planeado para 5 vuelos, completé 72 vuelos sobre el Cráter Jezero antes de descansar en las dunas.",
+          science: "Abrió la era de la exploración aérea interplanetaria en una atmósfera con menos del 1 % de la densidad terrestre."
+        },
+        en: {
+          name: "Ingenuity Mars Helicopter",
+          objectives: "Demonstrate powered, controlled flight in the thin Martian atmosphere.",
+          story: "Weighing just 1.8 kg, I achieved the first powered, controlled flight on another planet on April 19, 2021, completing 72 flights across Jezero Crater.",
+          science: "Pioneered aerial scouting in an atmosphere with less than 1% of Earth's density."
+        }
+      },
+      {
+        id: "near",
+        chapterIndex: 5,
+        body: "solar",
+        nssdca: "1996-008A",
+        lat: -35.0000,
+        lon: -14.0000,
+        date: "12 Feb 2001 (Aterrizaje en Eros)",
+        mass: "487 kg (Seca)",
+        power: "4 Paneles Solares GaAs",
+        status: "Posada intacta sobre el asteroide (433) Eros",
+        instruments: "Espectrómetro de Rayos X/Gamma, Magnetómetro, Altímetro Láser NLR, Cámara Multiespectral MSI.",
+        es: {
+          name: "Sonda NEAR Shoemaker (Asteroide Eros)",
+          objectives: "Orbitar y estudiar de cerca la composición, gravedad y morfología del asteroide cercano a la Tierra (433) Eros.",
+          story: "Aunque fui diseñada solo como orbitador sin patas de aterrizaje, el 12 de febrero de 2001 descendí suavemente a 6,4 km/h sobre el asteroide Eros y seguí transmitiendo desde su superficie.",
+          science: "Primera nave en orbitar y aterrizar suavemente sobre un asteroide cercano a la Tierra, enviando 160.000 imágenes."
+        },
+        en: {
+          name: "NEAR Shoemaker (Asteroid Eros)",
+          objectives: "Orbit and study the composition and morphology of near-Earth asteroid 433 Eros.",
+          story: "Though built without landing legs, on February 12, 2001, I touched down gently at 6.4 km/h on asteroid 433 Eros and transmitted from its surface.",
+          science: "First spacecraft to orbit and land on an asteroid, returning 160,000 images."
+        }
+      },
+      {
+        id: "dawn",
+        chapterIndex: 5,
+        body: "solar",
+        nssdca: "2007-043A",
+        lat: 0.0000,
+        lon: 90.0000,
+        date: "06 Mar 2015 (Llegada a Ceres)",
+        mass: "747.1 kg (Seca)",
+        power: "Paneles Solares de 19.7 m + Propulsión Iónica de Xenón",
+        status: "Monumento Celestial en Órbita Perpetua de Ceres",
+        instruments: "3 Motores de Iones NSTAR, Cámara de Encuadre FC, Espectrómetro VIR, Detector de Rayos Gamma y Neutrones GRaND.",
+        es: {
+          name: "Sonda Orbitadora Dawn (Vesta y Ceres)",
+          objectives: "Caracterizar las condiciones y procesos de la época más temprana del sistema solar orbitando Vesta y el planeta enano Ceres.",
+          story: "Impulsada por un resplandor azul de iones de xenón, fui la primera nave en orbitar dos destinos extraterrestres distintos: el protoplaneta Vesta y el planeta enano Ceres, alrededor del cual giro eternamente.",
+          science: "Demostró que Ceres tuvo un océano subterráneo salado y criovolcanes activos recientes como Ahuna Mons."
+        },
+        en: {
+          name: "Dawn Spacecraft (Vesta & Ceres)",
+          objectives: "Characterize early solar system conditions by orbiting Vesta and dwarf planet Ceres.",
+          story: "Powered by xenon ion engines, I became the first spacecraft to orbit two extraterrestrial targets: Vesta and dwarf planet Ceres, where I remain in eternal orbit.",
+          science: "Revealed subsurface briny reservoirs and cryovolcanoes on dwarf planet Ceres."
+        }
+      },
+      {
+        id: "kepler",
+        chapterIndex: 5,
+        body: "solar",
+        nssdca: "2009-011A",
+        lat: 12.0000,
+        lon: -110.0000,
+        date: "07 Mar 2009 – 30 Oct 2018",
+        mass: "995.2 kg",
+        power: "Paneles Solares de 10.2 m²",
+        status: "Retirado en Órbita Heliocéntrica Segura",
+        instruments: "Fotómetro de Espejo Primario de 1.4 metros y Matriz de 42 sensores CCD (95 Megapíxeles).",
+        es: {
+          name: "Telescopio Espacial Kepler / K2",
+          objectives: "Explorar la estructura y diversidad de sistemas planetarios para determinar la frecuencia de planetas terrestres en zonas habitables.",
+          story: "Observé más de medio millón de estrellas buscando el diminuto parpadeo de mundos lejanos. Cuando falló mi segunda rueda de reacción, me apoyé en la presión de la luz del Sol para seguir descubriendo exoplanetas.",
+          science: "Descubrió más de 2.600 exoplanetas confirmados y demostró estadísticamente que nuestra galaxia tiene más planetas que estrellas."
+        },
+        en: {
+          name: "Kepler Space Telescope (K2)",
+          objectives: "Survey planetary systems to determine the frequency of Earth-sized planets in habitable zones.",
+          story: "I monitored over 500,000 stars for planetary transits and used solar radiation pressure to stabilize my K2 mission before retiring in solar orbit in 2018.",
+          science: "Discovered over 2,600 exoplanets, proving our galaxy harbors more planets than stars."
+        }
+      },
+      {
+        id: "pioneer10",
+        chapterIndex: 5,
+        body: "solar",
+        nssdca: "1972-012A",
+        lat: 20.0000,
+        lon: 68.0000,
+        date: "02 Mar 1972 (Última señal: 23 Ene 2003)",
+        mass: "258 kg",
+        power: "4 Generadores Nucleares RTG SNAP-19",
+        status: "Viajando en el Espacio Interestelar (>135 UA rumbo a Aldebarán)",
+        instruments: "Magnetómetro de Vapor de Helio, Fotopolarímetro, Detector de Rayos Cósmicos y la Placa Dorada de Pioneer.",
+        es: {
+          name: "Sonda Interestelar Pioneer 10",
+          objectives: "Explorar el medio interplanetario más allá de la órbita de Marte, estudiar el cinturón de asteroides y realizar el primer acercamiento a Júpiter.",
+          story: "Fui la primera en cruzar el cinturón de asteroides y fotografiar Júpiter de cerca. Mi último susurro de radio en 2003 tardó 11 horas y 20 minutos en llegar a la Tierra; hoy viajo en silencio hacia la estrella Aldebarán llevando una placa dorada de la humanidad.",
+          science: "Abrió el camino hacia el sistema solar exterior y lleva el mensaje diseñado por Carl Sagan y Frank Drake."
+        },
+        en: {
+          name: "Pioneer 10 Interstellar Probe",
+          objectives: "Explore beyond Mars's orbit, cross the asteroid belt, and perform the first close flyby of Jupiter.",
+          story: "First spacecraft to cross the asteroid belt and fly by Jupiter. My last signal in 2003 took 11 hours and 20 minutes to reach Earth; I now coast toward Aldebaran carrying the Golden Plaque.",
+          science: "Blazed the trail to the outer solar system and carries humanity's gold-anodized message plaque."
+        }
+      }
+    ];
+
+    const chapters = [
+      {
+        num: "Capítulo 1:",
+        title: "El Águila y el Espejo que Aún Responde",
+        subtitle: "La Luna • Mare Tranquillitatis (Apolo 11, 1969)",
+        speaker: "🌕 Módulo Lunar Eagle (Apolo 11)",
+        soundType: "laser",
+        soundLabel: "🎧 Paisaje Sonoro: Pulso Óptico Láser LRRR + Telemetría Quindar NASA",
+        targetScene: "moon",
+        targetArtifactId: "apollo11",
+        svgIllustration: `
+          <svg viewBox="0 0 220 220" class="w-48 h-48 md:w-68 md:h-68 drop-shadow-[0_0_35px_rgba(251,191,36,0.45)]">
+            <circle cx="110" cy="110" r="88" fill="#cbd5e1"/>
+            <circle cx="75" cy="80" r="16" fill="#94a3b8"/>
+            <circle cx="145" cy="135" r="22" fill="#94a3b8"/>
+            <rect x="78" y="95" width="64" height="32" rx="4" fill="#f59e0b" stroke="#fef08a" stroke-width="2"/>
+            <line x1="78" y1="127" x2="58" y2="155" stroke="#eab308" stroke-width="5"/>
+            <line x1="142" y1="127" x2="162" y2="155" stroke="#eab308" stroke-width="5"/>
+            <ellipse cx="55" cy="156" rx="10" ry="3" fill="#fef08a"/>
+            <ellipse cx="165" cy="156" rx="10" ry="3" fill="#fef08a"/>
+            <line x1="175" y1="145" x2="215" y2="15" stroke="#4ade80" stroke-width="3" stroke-dasharray="5,3"/>
+            <circle cx="175" cy="145" r="6" fill="#4ade80"/>
+            <path d="M95 108 Q102 115 108 108" stroke="#451a03" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <path d="M115 108 Q122 115 128 108" stroke="#451a03" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </svg>
+        `,
+        dialogues: [
+          "Hola, terrícola. Soy Eagle, el módulo lunar del Apolo 11.",
+          "El 20 de julio de 1969 aterricé en el Mar de la Tranquilidad llevando a Neil Armstrong y Buzz Aldrin, los primeros humanos en caminar sobre la Luna. ¡Pilotaron de pie porque no había asientos!",
+          "Pasaron 21 horas en la Luna, caminaron 250 metros y dejaron mi etapa de descenso con la famosa placa: 'Vinimos en paz en nombre de toda la humanidad'.",
+          "Y no estoy sola: dejaron un sismómetro pasivo, un detector de polvo lunar y mi espejo retrorreflector láser (LRRR), que sigue reflejando rayos desde la Tierra más de 55 años después."
+        ],
+        nasaData: {
+          mission: "Apolo 11 — Módulo Lunar 'Eagle' (1969-059C) y paquete EASEP",
+          location: "La Luna — Mare Tranquillitatis (Mar de la Tranquilidad) a 0.67416° N, 23.47314° E",
+          dates: "Lanzamiento: 16 jul. 1969 | Alunizaje: 20 jul. 1969 | Fin del paquete científico: 27 ago. 1969",
+          hardware: "Etapa de descenso del Eagle (2.034 kg), sismómetro pasivo, detector de polvo lunar y retrorreflector láser (LRRR).",
+          facts: "¡La primera vez que la humanidad pisó la Luna! Neil y Buzz pilotaron de pie porque no había asientos, caminaron 250 metros y dejaron el espejo láser que sigue operativo hoy.",
+          links: ["https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059C"]
+        }
+      },
+      {
+        num: "Capítulo 2:",
+        title: "Amigos en el Cráter y el Primer Auto Lunar",
+        subtitle: "La Luna • Surveyor 3 (1967), Apolo 12 (1969) y Apolo 15 (1971)",
+        speaker: "🌕 Sonda Surveyor 3, Módulo Intrepid & Rover del Apolo 15",
+        soundType: "moonquake",
+        soundLabel: "🎧 Paisaje Sonoro: Vibración Sísmica Lunar (ALSEP) + Tono Quindar",
+        targetScene: "moon",
+        targetArtifactId: "surveyor3",
+        svgIllustration: `
+          <svg viewBox="0 0 220 220" class="w-48 h-48 md:w-68 md:h-68 drop-shadow-[0_0_35px_rgba(148,163,184,0.5)]">
+            <circle cx="110" cy="110" r="88" fill="#94a3b8"/>
+            <polygon points="85,70 60,130 110,130" fill="#e2e8f0" stroke="#475569" stroke-width="3"/>
+            <rect x="75" y="52" width="20" height="14" fill="#38bdf8"/>
+            <rect x="122" y="115" width="48" height="14" rx="4" fill="#facc15"/>
+            <circle cx="130" cy="134" r="10" fill="#1e293b" stroke="#e2e8f0" stroke-width="2"/>
+            <circle cx="162" cy="134" r="10" fill="#1e293b" stroke="#e2e8f0" stroke-width="2"/>
+            <path d="M138 115 L146 95 L158 90" stroke="#fef08a" stroke-width="3" fill="none"/>
+          </svg>
+        `,
+        dialogues: [
+          "Yo soy Surveyor 3. En abril de 1967 aterricé dando tres botes en un pequeño cráter del Océano de las Tormentas. Mi brazo excavador demostró que el polvo lunar era firme como arena húmeda.",
+          "Dos años y medio después, el módulo Intrepid del Apolo 12 logró un aterrizaje con precisión de francotirador a solo 180 metros de mí. ¡Fue el primer y único caso de verdadera arqueología espacial!",
+          "Los astronautas del Apolo 12 caminaron casi 8 horas, desmontaron mi cámara de TV para traerla a la Tierra, dejaron su estación nuclear ALSEP enviando datos por casi 8 años y provocaron el primer 'lunamoto' artificial.",
+          "Y en 1971, al pie de los Montes Apeninos, el módulo Falcon del Apolo 15 estrenó el primer 'auto' conducido fuera de la Tierra (el Rover Lunar), condujo casi 28 km, demostró la teoría de Galileo con un martillo y una pluma, y dejó una estatuilla en honor a los exploradores espaciales fallecidos."
+        ],
+        nasaData: {
+          mission: "Surveyor 3 (1967), Apolo 12 'Intrepid' (1969-099C) y Apolo 15 'Falcon' + Rover LRV (1971-063C)",
+          location: "Oceanus Procellarum: Surveyor 3 (3° S, 23.41° O) e Intrepid (3.0128° S, 23.4219° O). Mare Imbrium / Montes Apeninos: Falcon (26.13239° N, 3.63330° E).",
+          dates: "Surveyor 3: 17 abr. – 4 may. 1967 | Apolo 12: 14 nov. 1969 – 30 sep. 1977 | Apolo 15: 26 jul. 1971 – 30 sep. 1977.",
+          hardware: "Estructura trípode de Surveyor 3 (997 kg, sin su cámara ni pala), etapa de descenso de Intrepid (2.118 kg) con estación ALSEP y generador SNAP-27, y etapa de descenso de Falcon con Vehículo Explorador Lunar (LRV).",
+          facts: "Apolo 12 quemó accidentalmente su cámara de TV en vivo al apuntarla al Sol; Apolo 15 trajo 77 kg de rocas y probó la caída simultánea del martillo y la pluma en el vacío.",
+          links: [
+            "https://science.nasa.gov/mission/surveyor-3/",
+            "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-099C",
+            "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1971-063C"
+          ]
+        }
+      },
+      {
+        num: "Capítulo 3:",
+        title: "Los Primeros Encuentros y Aterrizajes en el Planeta Rojo",
+        subtitle: "Marte • Mariner 4, 6, 7 y 9 (1964–1971), Viking 1 y 2 (1976) y Pathfinder (1997)",
+        speaker: "🔴 Sondas Mariner, Módulos Viking 1 y 2 & Pathfinder / Sojourner",
+        soundType: "bounce",
+        soundLabel: "🎧 Paisaje Sonoro: Entrada Atmosférica y Amortiguación de Airbags en Marte",
+        targetScene: "mars",
+        targetArtifactId: "viking1",
+        svgIllustration: `
+          <svg viewBox="0 0 220 220" class="w-48 h-48 md:w-68 md:h-68 drop-shadow-[0_0_40px_rgba(234,88,12,0.5)]">
+            <circle cx="110" cy="110" r="88" fill="#ea580c"/>
+            <path d="M30 140 Q110 120 190 145 L180 185 L40 185 Z" fill="#9a3412"/>
+            <circle cx="80" cy="125" r="20" fill="#fde047" opacity="0.85"/>
+            <circle cx="105" cy="120" r="22" fill="#facc15" opacity="0.9"/>
+            <circle cx="130" cy="125" r="20" fill="#fde047" opacity="0.85"/>
+            <rect x="85" y="142" width="52" height="14" rx="3" fill="#38bdf8" stroke="#fef08a" stroke-width="2"/>
+            <circle cx="92" cy="160" r="6" fill="#1e293b"/>
+            <circle cx="111" cy="160" r="6" fill="#1e293b"/>
+            <circle cx="130" cy="160" r="6" fill="#1e293b"/>
+          </svg>
+        `,
+        dialogues: [
+          "¡Saludos desde Marte! Nuestra historia comenzó desde el espacio: en 1965 Mariner 4 pasó a 9.844 km en el primer sobrevuelo de Marte, y en 1969 las gemelas Mariner 6 y 7 enviaron 201 fotos descartando los supuestos canales artificiales.",
+          "En 1971 Mariner 9 esperó a que pasara una tormenta global de polvo y envió más de 7.000 fotografías: ¡descubrió antiguos ríos, enormes volcanes y profundos cañones que prepararon el camino para aterrizar!",
+          "En 1976 nosotras, las gemelas Viking 1 y Viking 2, descendimos en Chryse Planitia y Utopia Planitia. Viking 1 fue el primer módulo estadounidense en transmitir imágenes desde la superficie marciana mientras buscábamos señales de vida.",
+          "Y el 4 de julio de 1997 llegué yo, Mars Pathfinder: protegida por enormes airbags reboté sobre Ares Vallis y desplegué a Sojourner, el primer rover marciano, operando casi tres meses cuando solo esperaban una semana."
+        ],
+        nasaData: {
+          mission: "Mariner 4, Mariner 6 y 7, Mariner 9, Viking 1 y 2, y Mars Pathfinder / Sojourner",
+          location: "Marte — Sobrevuelos/Órbita (Mariner 4, 6, 7 y 9) | Viking 1 (22,27° N, 312,05° E) | Viking 2 (47,64° N, 134,29° E) | Pathfinder (19,13° N, 33,22° O).",
+          dates: "Mariner 4: 1964–1967 | Mariner 6 y 7: 1969–1970 | Mariner 9: 1971–1972 | Viking 1 y 2: 1975–1982 | Pathfinder: dic. 1996 – sep. 1997.",
+          hardware: "Sondas Mariner de sobrevuelo y órbita, módulos de aterrizaje Viking 1 y 2 con brazo robótico, sismómetro y laboratorio biológico, y módulo Pathfinder con airbags y rover Sojourner con espectrómetro APXS.",
+          facts: "Mariner 6 y 7 transmitían datos casi 2000 veces más rápido que Mariner 4; el orbitador de Viking 2 completó más de 700 vueltas; Pathfinder demostró que se podía aterrizar en Marte con airbags.",
+          links: [
+            "https://nssdc.gsfc.nasa.gov/planetary/mars/mariner.html",
+            "https://nssdc.gsfc.nasa.gov/planetary/viking.html",
+            "https://nssdc.gsfc.nasa.gov/planetary/mesur.html"
+          ]
+        }
+      },
+      {
+        num: "Capítulo 4:",
+        title: "Los Gemelos Incansables, el Laboratorio Rodante y el Médico de Marte",
+        subtitle: "Marte • Spirit & Opportunity (2004–2019), Curiosity (2012–presente) e InSight (2018–2022)",
+        speaker: "🔴 Spirit, Opportunity, Curiosity & InSight",
+        soundType: "wind",
+        soundLabel: "🎧 Paisaje Sonoro: Viento Marciano Realista (Frecuencias Sísmicas de InSight)",
+        targetScene: "mars",
+        targetArtifactId: "opportunity",
+        svgIllustration: `
+          <svg viewBox="0 0 220 220" class="w-48 h-48 md:w-68 md:h-68 drop-shadow-[0_0_40px_rgba(249,115,22,0.5)]">
+            <circle cx="110" cy="110" r="88" fill="#c2410c"/>
+            <polygon points="45,125 175,125 155,148 65,148" fill="#1d4ed8" stroke="#93c5fd" stroke-width="2"/>
+            <line x1="110" y1="125" x2="110" y2="75" stroke="#e2e8f0" stroke-width="6"/>
+            <rect x="94" y="65" width="32" height="14" rx="4" fill="#f8fafc"/>
+            <circle cx="102" cy="72" r="4" fill="#0ea5e9"/>
+            <circle cx="118" cy="72" r="4" fill="#0ea5e9"/>
+            <path d="M70 165 Q110 185 150 165" stroke="#fde047" stroke-width="2.5" fill="none" stroke-dasharray="4,4"/>
+            <path d="M55 178 Q110 202 165 178" stroke="#fde047" stroke-width="2" fill="none" stroke-dasharray="4,4"/>
+          </svg>
+        `,
+        dialogues: [
+          "Somos Spirit y Opportunity, robots gemelos enviados a lados opuestos de Marte en enero de 2004 con una misión diseñada para durar solamente 90 días marcianos.",
+          "¡Superamos todas las expectativas! Spirit trabajó más de 6 años en el cráter Gusev y Opportunity operó casi 15 años en Meridiani Planum, hallando minerales y huellas de antiguos ambientes con agua líquida hasta la enorme tormenta de polvo de 2018.",
+          "En agosto de 2012 descendí yo, Curiosity, del tamaño de un automóvil, suspendido por una 'grúa voladora' sobre el cráter Gale. Sigo operativo demostrando que antiguos ríos y lagos tuvieron minerales donde microorganismos podrían haber sobrevivido.",
+          "Y entre 2018 y 2022, en Elysium Planitia, yo —el módulo InSight— coloqué mi sismómetro sobre el suelo marciano para escuchar el viento y más de 1.300 'martemotos'."
+        ],
+        nasaData: {
+          mission: "Spirit y Opportunity (MER), Curiosity (MSL) y Módulo Geofísico InSight",
+          location: "Marte — Spirit (14,57° S, 175,47° E) | Opportunity (1,95° S, 354,47° E) | Curiosity en Cráter Gale (4,59° S, 137,44° E) | InSight en Elysium Planitia (4,50° N, 135,62° E).",
+          dates: "Spirit: 2003–2010 | Opportunity: 2003–2019 | Curiosity: 2011 – continúa operativa (nov. 2026) | InSight: 2018–2022.",
+          hardware: "Rovers gemelos Spirit y Opportunity (cámaras panorámicas, espectrómetros y herramienta de abrasión), rover Curiosity (láser ChemCam, laboratorio SAM y taladro) y lander InSight (sismómetro SEIS).",
+          facts: "Spirit y Opportunity probaron que Marte fue mucho más húmedo en el pasado; Curiosity sigue activo en noviembre de 2026 explorando el cráter Gale.",
+          links: [
+            "https://science.nasa.gov/mission/mars-exploration-rovers-spirit-and-opportunity/",
+            "https://science.nasa.gov/mission/msl-curiosity/",
+            "https://science.nasa.gov/mission/insight/"
+          ]
+        }
+      },
+      {
+        num: "Capítulo 5:",
+        title: "Siete Minutos de Terror y el Primer Helicóptero en Otro Planeta",
+        subtitle: "Marte • Cráter Jezero: Perseverance (2021–presente) e Ingenuity (2021–2024)",
+        speaker: "🚁 Rover Perseverance & Helicóptero Marciano Ingenuity",
+        soundType: "rotor",
+        soundLabel: "🎧 Paisaje Sonoro: Rotores Coaxiales a 2.400 RPM en Atmósfera Marciana",
+        targetScene: "mars",
+        targetArtifactId: "perseverance",
+        svgIllustration: `
+          <svg viewBox="0 0 220 220" class="w-48 h-48 md:w-68 md:h-68 drop-shadow-[0_0_40px_rgba(251,146,60,0.5)]">
+            <circle cx="110" cy="110" r="88" fill="#9a3412"/>
+            <ellipse cx="110" cy="68" rx="68" ry="6" fill="#e2e8f0" opacity="0.85"/>
+            <ellipse cx="110" cy="80" rx="68" ry="6" fill="#cbd5e1" opacity="0.85"/>
+            <line x1="110" y1="58" x2="110" y2="95" stroke="#f8fafc" stroke-width="5"/>
+            <rect x="92" y="95" width="36" height="32" rx="5" fill="#f59e0b" stroke="#fef08a" stroke-width="2"/>
+            <line x1="95" y1="127" x2="70" y2="162" stroke="#e2e8f0" stroke-width="3"/>
+            <line x1="125" y1="127" x2="150" y2="162" stroke="#e2e8f0" stroke-width="3"/>
+            <line x1="100" y1="127" x2="82" y2="166" stroke="#94a3b8" stroke-width="2.5"/>
+            <line x1="120" y1="127" x2="138" y2="166" stroke="#94a3b8" stroke-width="2.5"/>
+          </svg>
+        `,
+        dialogues: [
+          "¡Hola desde el cráter Jezero! Soy Perseverance. El 18 de febrero de 2021 superé de manera totalmente autónoma los 'Siete Minutos de Terror', descendiendo con paracaídas y grúa aérea sobre un antiguo lago alimentado por un río.",
+          "Continúo operativo buscando señales de vida antigua, produciendo oxígeno con MOXIE y guardando muestras de rocas en pequeños tubos para una futura misión que podría traerlas a la Tierra.",
+          "Y bajo mi vientre llevé a Ingenuity, ¡el primer helicóptero que voló en otro planeta! Con solo 1,8 kg de peso logró despegar el 19 de abril de 2021 en un aire con menos del 1 % de la densidad terrestre.",
+          "Planeado para apenas 5 vuelos, Ingenuity completó 72 vuelos sobre el cráter Jezero antes de descansar en las dunas en enero de 2024."
+        ],
+        nasaData: {
+          mission: "Rover Perseverance (Mars 2020) y Helicóptero Marciano Ingenuity",
+          location: "Marte — Cráter Jezero (18,44° N, 77,45° E).",
+          dates: "Lanzamiento: 30 jul. 2020 | Aterrizaje: 18 feb. 2021 | Perseverance: continúa operativa (nov. 2026) | Ingenuity: 72 vuelos hasta ene. 2024.",
+          hardware: "Rover Perseverance con cámaras Mastcam-Z, SuperCam, PIXL, SHERLOC, RIMFAX, MOXIE, sensores MEDA y tubos de muestras; Helicóptero solar Ingenuity de 1,8 kg.",
+          facts: "Perseverance descendió de forma autónoma sin ayuda directa de la Tierra; sus descubrimientos buscan responder si estuvimos alguna vez acompañados por vida en Marte.",
+          links: [
+            "https://science.nasa.gov/mission/mars-2020-perseverance/",
+            "https://science.nasa.gov/mission/mars-2020-perseverance/ingenuity-mars-helicopter/"
+          ]
+        }
+      },
+      {
+        num: "Capítulo 6:",
+        title: "Viajeros de Asteroides, Estrellas y el Infinito",
+        subtitle: "Espacio Profundo • NEAR Shoemaker, Dawn, Kepler y Pioneer 10",
+        speaker: "🌌 NEAR Shoemaker, Dawn, Kepler & Pioneer 10",
+        soundType: "deepspace",
+        soundLabel: "🎧 Paisaje Sonoro: Ondas de Plasma de Espacio Profundo + Eco de Pioneer 10",
+        targetScene: "solar",
+        targetArtifactId: "pioneer10",
+        svgIllustration: `
+          <svg viewBox="0 0 220 220" class="w-48 h-48 md:w-68 md:h-68 drop-shadow-[0_0_45px_rgba(56,189,248,0.55)]">
+            <circle cx="110" cy="110" r="88" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+            <rect x="22" y="98" width="62" height="22" rx="3" fill="#0284c7" stroke="#7dd3fc" stroke-width="2"/>
+            <rect x="136" y="98" width="62" height="22" rx="3" fill="#0284c7" stroke="#7dd3fc" stroke-width="2"/>
+            <circle cx="110" cy="109" r="24" fill="#f59e0b" stroke="#fef08a" stroke-width="2"/>
+            <rect x="102" y="102" width="16" height="12" fill="#fde047"/>
+            <polygon points="102,133 118,133 128,185 92,185" fill="#38bdf8" opacity="0.6"/>
+          </svg>
+        `,
+        dialogues: [
+          "Más allá de Marte también quedamos guardianes eternos. Yo soy NEAR Shoemaker: aunque no tenía patas de aterrizaje, el 12 de febrero de 2001 me posé suavemente a 6,4 km/h sobre el asteroide Eros y seguí transmitiendo dos semanas antes de dormirme a -173 °C.",
+          "Yo soy Dawn: gracias a mis motores de iones de gas xenón fui la primera nave en orbitar dos mundos distintos —el asteroide gigante Vesta y el planeta enano Ceres—, alrededor del cual giro hoy como un monumento celestial silencioso.",
+          "Yo soy el telescopio espacial Kepler: cuando perdí mi segunda rueda giroscópica en 2013, usé la presión de la luz del Sol como un kayak en la corriente para mi misión K2. Antes de retirarme en órbita solar en 2018, descubrí más de 2.600 exoplanetas y probé que hay más planetas que estrellas.",
+          "Y yo soy Pioneer 10, lanzada en 1972. Fui la primera en cruzar el cinturón de asteroides y sobrevolar Júpiter. Mi última señal en 2003 tardó 11 horas y 20 minutos en llegar a casa; hoy viajo en silencio a más de 17.700 millones de kilómetros rumbo a la estrella Aldebarán llevando una placa dorada con el mapa de la Tierra."
+        ],
+        nasaData: {
+          mission: "NEAR Shoemaker, Sonda Orbitadora Dawn, Telescopio Espacial Kepler/K2 y Sonda Interestelar Pioneer 10",
+          location: "NEAR: Superficie del asteroide (433) Eros | Dawn: Órbita perpetua de Ceres | Kepler: Órbita heliocéntrica | Pioneer 10: Espacio interestelar rumbo a Aldebarán en Tauro.",
+          dates: "Pioneer 10: 1972–2003 | NEAR: 1996–2001 | Dawn: 2007–2018 | Kepler/K2: 2009–2018.",
+          hardware: "Sonda NEAR (487 kg secos) intacta en Eros; sonda Dawn (747 kg, paneles de 19,7 m) en órbita de Ceres; telescopio Kepler (espejo de 1,4 m) en órbita solar; y Pioneer 10 (258 kg, RTG nucleares y Placa de Pioneer).",
+          facts: "NEAR envió 160.000 fotos; Dawn operó sus motores iónicos durante 5,9 años acumulados; Kepler analizó más de 500.000 estrellas; Pioneer 10 pasará cerca de Aldebarán en unos 2 millones de años.",
+          links: [
+            "https://science.nasa.gov/mission/near-shoemaker/",
+            "https://science.nasa.gov/mission/dawn/",
+            "https://science.nasa.gov/mission/kepler/",
+            "https://science.nasa.gov/mission/pioneer-10/"
+          ]
+        }
+      }
+    ];
+
+    let audioCtx = null;
+    let masterGainNode = null;
+    let ambientPadGain = null;
+    let sfxGainNode = null;
+    let analyserNode = null;
+    let padOscillators = [];
+    let noiseBufferPink = null;
+    let noiseBufferBrown = null;
+    let chordProgressionTimer = null;
+    let currentChordIdx = 0;
+
+    let voiceEnabled = true;
+    let musicEnabled = true;
+    let masterVolume = 0.75;
+    let isSpeakingNow = false;
+    let selectedVoiceURI = "";
+
+    const SPACE_CHORDS = [
+      [65.41, 130.81, 196.00, 246.94, 293.66],
+      [58.27, 116.54, 174.61, 220.00, 261.63],
+      [43.65, 87.31,  130.81, 164.81, 196.00],
+      [49.00, 98.00,  146.83, 196.00, 246.94]
+    ];
+
+    function createNoiseBuffers(ctx) {
+      const sampleRate = ctx.sampleRate;
+      const length = sampleRate * 4;
+
+      noiseBufferPink = ctx.createBuffer(1, length, sampleRate);
+      const pinkOut = noiseBufferPink.getChannelData(0);
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < length; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        pinkOut[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.04;
+        b6 = white * 0.115926;
+      }
+
+      noiseBufferBrown = ctx.createBuffer(1, length, sampleRate);
+      const brownOut = noiseBufferBrown.getChannelData(0);
+      let lastOut = 0.0;
+      for (let i = 0; i < length; i++) {
+        const white = Math.random() * 2 - 1;
+        brownOut[i] = (lastOut + (0.02 * white)) / 1.02;
+        lastOut = brownOut[i];
+        brownOut[i] *= 2.5;
+      }
+    }
+
+    function initAudioEngine() {
+      if (audioCtx) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        return;
+      }
+
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AudioContextClass();
+      createNoiseBuffers(audioCtx);
+
+      masterGainNode = audioCtx.createGain();
+      masterGainNode.gain.setValueAtTime(masterVolume, audioCtx.currentTime);
+
+      analyserNode = audioCtx.createAnalyser();
+      analyserNode.fftSize = 128;
+
+      masterGainNode.connect(analyserNode);
+      analyserNode.connect(audioCtx.destination);
+
+      sfxGainNode = audioCtx.createGain();
+      sfxGainNode.gain.setValueAtTime(0.85, audioCtx.currentTime);
+      sfxGainNode.connect(masterGainNode);
+
+      ambientPadGain = audioCtx.createGain();
+      ambientPadGain.gain.setValueAtTime(musicEnabled ? 0.22 : 0.0001, audioCtx.currentTime);
+
+      const padFilter = audioCtx.createBiquadFilter();
+      padFilter.type = 'lowpass';
+      padFilter.frequency.setValueAtTime(420, audioCtx.currentTime);
+      padFilter.Q.setValueAtTime(1.2, audioCtx.currentTime);
+
+      const lfo = audioCtx.createOscillator();
+      const lfoGain = audioCtx.createGain();
+      lfo.type = 'sine';
+      lfo.frequency.setValueAtTime(0.08, audioCtx.currentTime);
+      lfoGain.gain.setValueAtTime(240, audioCtx.currentTime);
+      lfo.connect(lfoGain);
+      lfoGain.connect(padFilter.frequency);
+      lfo.start();
+
+      const delayL = audioCtx.createDelay(2.0);
+      const delayR = audioCtx.createDelay(2.0);
+      delayL.delayTime.setValueAtTime(0.42, audioCtx.currentTime);
+      delayR.delayTime.setValueAtTime(0.64, audioCtx.currentTime);
+
+      const feedback = audioCtx.createGain();
+      feedback.gain.setValueAtTime(0.36, audioCtx.currentTime);
+
+      const wetGain = audioCtx.createGain();
+      wetGain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+
+      padFilter.connect(ambientPadGain);
+      padFilter.connect(delayL);
+      delayL.connect(delayR);
+      delayR.connect(feedback);
+      feedback.connect(delayL);
+      delayL.connect(wetGain);
+      delayR.connect(wetGain);
+      wetGain.connect(ambientPadGain);
+
+      ambientPadGain.connect(masterGainNode);
+
+      const initialChord = SPACE_CHORDS[0];
+      initialChord.forEach((freq, idx) => {
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const voiceGain = audioCtx.createGain();
+
+        osc1.type = idx === 0 ? 'sine' : 'triangle';
+        osc2.type = 'sine';
+
+        osc1.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc2.frequency.setValueAtTime(freq * 1.003, audioCtx.currentTime);
+
+        voiceGain.gain.setValueAtTime(idx === 0 ? 0.25 : 0.12, audioCtx.currentTime);
+
+        osc1.connect(voiceGain);
+        osc2.connect(voiceGain);
+        voiceGain.connect(padFilter);
+
+        osc1.start();
+        osc2.start();
+        padOscillators.push({ osc1, osc2 });
+      });
+
+      const airSource = audioCtx.createBufferSource();
+      airSource.buffer = noiseBufferPink;
+      airSource.loop = true;
+      const airFilter = audioCtx.createBiquadFilter();
+      airFilter.type = 'bandpass';
+      airFilter.frequency.setValueAtTime(300, audioCtx.currentTime);
+      airFilter.Q.setValueAtTime(0.7, audioCtx.currentTime);
+      const airGain = audioCtx.createGain();
+      airGain.gain.setValueAtTime(0.035, audioCtx.currentTime);
+      airSource.connect(airFilter);
+      airFilter.connect(airGain);
+      airGain.connect(ambientPadGain);
+      airSource.start();
+
+      if (!chordProgressionTimer) {
+        chordProgressionTimer = setInterval(() => {
+          if (!audioCtx || !musicEnabled) return;
+          currentChordIdx = (currentChordIdx + 1) % SPACE_CHORDS.length;
+          const nextChord = SPACE_CHORDS[currentChordIdx];
+          const now = audioCtx.currentTime;
+          padOscillators.forEach((pair, i) => {
+            pair.osc1.frequency.exponentialRampToValueAtTime(nextChord[i], now + 3.8);
+            pair.osc2.frequency.exponentialRampToValueAtTime(nextChord[i] * 1.003, now + 3.8);
+          });
+        }, 9000);
+      }
+    }
+
+    function setAmbientDucking(duckingActive) {
+      if (!audioCtx || !ambientPadGain) return;
+      const now = audioCtx.currentTime;
+      if (!musicEnabled) {
+        ambientPadGain.gain.setTargetAtTime(0.0001, now, 0.2);
+        return;
+      }
+      const target = duckingActive ? 0.09 : 0.22;
+      ambientPadGain.gain.setTargetAtTime(target, now, 0.35);
+    }
+
+    function playQuindarTone(isIntro = true) {
+      if (!audioCtx || !musicEnabled) return;
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(isIntro ? 2525 : 2475, now);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.035, now + 0.015);
+      gain.gain.setValueAtTime(0.035, now + 0.18);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+      osc.connect(gain);
+      gain.connect(sfxGainNode);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    }
+
+    function playChapterSoundEffect(type) {
+      initAudioEngine();
+      if (!musicEnabled || !audioCtx) return;
+      const now = audioCtx.currentTime;
+
+      if (type === "laser") {
+        playQuindarTone(true);
+        [0, 0.22, 0.44].forEach((delay, idx) => {
+          const osc = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          osc.type = 'sine';
+          const startFreq = 1318.5 - idx * 180;
+          osc.frequency.setValueAtTime(startFreq, now + delay);
+          osc.frequency.exponentialRampToValueAtTime(startFreq * 1.5, now + delay + 0.18);
+          g.gain.setValueAtTime(0.001, now + delay);
+          g.gain.linearRampToValueAtTime(0.06 / (idx + 1), now + delay + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + delay + 0.35);
+          osc.connect(g);
+          g.connect(sfxGainNode);
+          osc.start(now + delay);
+          osc.stop(now + delay + 0.36);
+        });
+      } else if (type === "moonquake") {
+        playQuindarTone(true);
+        const src = audioCtx.createBufferSource();
+        src.buffer = noiseBufferBrown;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(85, now);
+        const g = audioCtx.createGain();
+        g.gain.setValueAtTime(0.001, now);
+        g.gain.linearRampToValueAtTime(0.28, now + 0.4);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
+        src.connect(filter);
+        filter.connect(g);
+        g.connect(sfxGainNode);
+        src.start(now);
+        src.stop(now + 2.3);
+      } else if (type === "bounce") {
+        const src = audioCtx.createBufferSource();
+        src.buffer = noiseBufferPink;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(600, now);
+        filter.frequency.exponentialRampToValueAtTime(140, now + 1.2);
+        const g = audioCtx.createGain();
+        g.gain.setValueAtTime(0.001, now);
+        g.gain.linearRampToValueAtTime(0.16, now + 0.25);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 1.3);
+        src.connect(filter);
+        filter.connect(g);
+        g.connect(sfxGainNode);
+        src.start(now);
+        src.stop(now + 1.35);
+
+        [0.35, 0.75, 1.08].forEach((t, i) => {
+          const osc = audioCtx.createOscillator();
+          const bg = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(140 - i * 20, now + t);
+          osc.frequency.exponentialRampToValueAtTime(52, now + t + 0.25);
+          bg.gain.setValueAtTime(0.12 / (i + 1), now + t);
+          bg.gain.exponentialRampToValueAtTime(0.001, now + t + 0.26);
+          osc.connect(bg);
+          bg.connect(sfxGainNode);
+          osc.start(now + t);
+          osc.stop(now + t + 0.27);
+        });
+      } else if (type === "wind") {
+        const src = audioCtx.createBufferSource();
+        src.buffer = noiseBufferPink;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.Q.setValueAtTime(3.2, now);
+        filter.frequency.setValueAtTime(180, now);
+        filter.frequency.exponentialRampToValueAtTime(420, now + 1.1);
+        filter.frequency.exponentialRampToValueAtTime(150, now + 2.6);
+
+        const g = audioCtx.createGain();
+        g.gain.setValueAtTime(0.001, now);
+        g.gain.linearRampToValueAtTime(0.22, now + 0.8);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 2.7);
+
+        src.connect(filter);
+        filter.connect(g);
+        g.connect(sfxGainNode);
+        src.start(now);
+        src.stop(now + 2.8);
+      } else if (type === "rotor") {
+        const src = audioCtx.createBufferSource();
+        src.buffer = noiseBufferPink;
+        const aeroFilter = audioCtx.createBiquadFilter();
+        aeroFilter.type = 'bandpass';
+        aeroFilter.frequency.setValueAtTime(260, now);
+        aeroFilter.Q.setValueAtTime(2.0, now);
+
+        const bladeModGain = audioCtx.createGain();
+        bladeModGain.gain.setValueAtTime(0.08, now);
+
+        const bladeLFO = audioCtx.createOscillator();
+        bladeLFO.type = 'sine';
+        bladeLFO.frequency.setValueAtTime(32, now);
+        bladeLFO.frequency.linearRampToValueAtTime(44, now + 0.9);
+        const bladeDepth = audioCtx.createGain();
+        bladeDepth.gain.setValueAtTime(0.07, now);
+        bladeLFO.connect(bladeDepth);
+        bladeDepth.connect(bladeModGain.gain);
+
+        const env = audioCtx.createGain();
+        env.gain.setValueAtTime(0.001, now);
+        env.gain.linearRampToValueAtTime(1.0, now + 0.35);
+        env.gain.setValueAtTime(1.0, now + 1.4);
+        env.gain.exponentialRampToValueAtTime(0.001, now + 2.1);
+
+        src.connect(aeroFilter);
+        aeroFilter.connect(bladeModGain);
+        bladeModGain.connect(env);
+        env.connect(sfxGainNode);
+
+        bladeLFO.start(now);
+        src.start(now);
+        bladeLFO.stop(now + 2.15);
+        src.stop(now + 2.15);
+      } else {
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.14);
+          g.gain.setValueAtTime(0.001, now + idx * 0.14);
+          g.gain.linearRampToValueAtTime(0.04, now + idx * 0.14 + 0.04);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.14 + 0.7);
+          osc.connect(g);
+          g.connect(sfxGainNode);
+          osc.start(now + idx * 0.14);
+          osc.stop(now + idx * 0.14 + 0.75);
+        });
+      }
+    }
+
+    function triggerChapterSFXManual() {
+      const ch = chapters[currentChapterIndex];
+      playChapterSoundEffect(ch.soundType);
+    }
+
+    function populateVoiceList() {
+      if (!('speechSynthesis' in window)) return;
+      const voices = window.speechSynthesis.getVoices();
+      const select = document.getElementById('voice-select');
+      if (!select) return;
+
+      const esVoices = voices.filter(v => v.lang.toLowerCase().startsWith('es'));
+      if (esVoices.length === 0) return;
+
+      esVoices.sort((a, b) => {
+        const score = (v) => {
+          const n = v.name.toLowerCase();
+          let s = 0;
+          if (n.includes('natural') || n.includes('online')) s += 5;
+          if (n.includes('google') || n.includes('paulina') || n.includes('sabina') || n.includes('helena') || n.includes('mónica') || n.includes('elvira') || n.includes('dalia')) s += 3;
+          if (!v.localService) s += 2;
+          return s;
+        };
+        return score(b) - score(a);
+      });
+
+      select.innerHTML = `<option value="">Voz Natural Auto (${esVoices[0].name.slice(0, 16)}...)</option>` +
+        esVoices.map(v => `<option value="${v.voiceURI}">${v.name} (${v.lang})</option>`).join('');
+    }
+
+    if ('speechSynthesis' in window) {
+      populateVoiceList();
+      window.speechSynthesis.onvoiceschanged = populateVoiceList;
+    }
+
+    function changeSelectedVoice(uri) {
+      selectedVoiceURI = uri;
+      if (mainMode === 'story') replayCurrentVoice();
+    }
+
+    function getBestSpanishVoice() {
+      if (!('speechSynthesis' in window)) return null;
+      const voices = window.speechSynthesis.getVoices();
+      if (selectedVoiceURI) {
+        const found = voices.find(v => v.voiceURI === selectedVoiceURI);
+        if (found) return found;
+      }
+      const esVoices = voices.filter(v => v.lang.toLowerCase().startsWith('es'));
+      if (esVoices.length === 0) return null;
+      const preferred = esVoices.find(v => {
+        const n = v.name.toLowerCase();
+        return n.includes('natural') || n.includes('google') || n.includes('paulina') || n.includes('sabina') || n.includes('dalia') || n.includes('helena');
+      });
+      return preferred || esVoices[0];
+    }
+
+    let currentSpeechToken = 0;
+    let activeUtterance = null;
+    let speechDelayTimer = null;
+    let isIntroShowing = false;
+    const PAUSA_DESPUES_DEL_TITULO_MS = 900;
+    const TIEMPO_INTRO_SIN_VOZ_MS = 3500;
+
+    function stopCurrentSpeech() {
+      currentSpeechToken++;
+      if (speechDelayTimer) {
+        clearTimeout(speechDelayTimer);
+        speechDelayTimer = null;
+      }
+      if (activeUtterance) {
+        activeUtterance.onend = null;
+        activeUtterance.onerror = null;
+        activeUtterance = null;
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      isSpeakingNow = false;
+      setAmbientDucking(false);
+    }
+
+    function speakText(text, onFinishCallback = null) {
+      stopCurrentSpeech();
+      const myToken = currentSpeechToken;
+
+      if (!('speechSynthesis' in window) || !voiceEnabled) {
+        if (onFinishCallback) onFinishCallback();
+        return;
+      }
+
+      const clean = (text || '').trim();
+      if (!clean) {
+        if (onFinishCallback) onFinishCallback();
+        return;
+      }
+
+      speechDelayTimer = setTimeout(() => {
+        if (myToken !== currentSpeechToken) return;
+
+        const chosenVoice = getBestSpanishVoice();
+        const utterance = new SpeechSynthesisUtterance(clean);
+        activeUtterance = utterance;
+        utterance.lang = chosenVoice ? chosenVoice.lang : 'es-ES';
+        if (chosenVoice) utterance.voice = chosenVoice;
+        utterance.rate = 0.98;
+        utterance.pitch = 1.02;
+
+        isSpeakingNow = true;
+        setAmbientDucking(true);
+
+        utterance.onend = () => {
+          if (myToken !== currentSpeechToken) return;
+          activeUtterance = null;
+          isSpeakingNow = false;
+          setAmbientDucking(false);
+          if (onFinishCallback) onFinishCallback();
+        };
+
+        utterance.onerror = () => {
+          if (myToken !== currentSpeechToken) return;
+          activeUtterance = null;
+          isSpeakingNow = false;
+          setAmbientDucking(false);
+        };
+
+        window.speechSynthesis.speak(utterance);
+      }, 90);
+    }
+
+    function toggleVoice() {
+      voiceEnabled = !voiceEnabled;
+      const btn = document.getElementById('btn-voice');
+      if (voiceEnabled) {
+        btn.textContent = "🗣️ Voz: ON";
+        btn.className = "px-3 py-1.5 rounded-lg bg-amber-400 text-slate-950 font-bold flex items-center gap-1 transition";
+        if (mainMode === 'story' && !isIntroShowing) replayCurrentVoice();
+      } else {
+        stopCurrentSpeech();
+        btn.textContent = "🔇 Voz: OFF";
+        btn.className = "px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 font-semibold flex items-center gap-1 transition";
+      }
+    }
+
+    function toggleMusic() {
+      initAudioEngine();
+      musicEnabled = !musicEnabled;
+      const btn = document.getElementById('btn-music');
+      if (musicEnabled) {
+        btn.textContent = "🎵 Ambiente: ON";
+        btn.className = "px-3 py-1.5 rounded-lg bg-indigo-500/30 text-indigo-200 border border-indigo-400/40 font-semibold flex items-center gap-1 transition";
+        setAmbientDucking(isSpeakingNow);
+      } else {
+        btn.textContent = "🔇 Ambiente: OFF";
+        btn.className = "px-3 py-1.5 rounded-lg bg-slate-800 text-slate-400 font-semibold flex items-center gap-1 transition";
+        setAmbientDucking(false);
+      }
+    }
+
+    function updateMasterVolume(val) {
+      masterVolume = val / 100;
+      const label = document.getElementById('vol-label');
+      if (label) label.innerText = `${val}%`;
+      const slider = document.getElementById('master-vol-slider');
+      if (slider && slider.value !== String(val)) slider.value = val;
+
+      if (audioCtx && masterGainNode) {
+        masterGainNode.gain.setTargetAtTime(masterVolume, audioCtx.currentTime, 0.08);
+      }
+    }
+
+    let mainMode = 'story';
+    let currentChapterIndex = 0;
+    let currentDialogueIndex = 0;
+    let chapterIntroTimer = null;
+
+    function switchMainMode(mode) {
+      initAudioEngine();
+      mainMode = mode;
+      const storyWrap = document.getElementById('wrapper-story-mode');
+      const planetWrap = document.getElementById('wrapper-planetarium-mode');
+      const btnStory = document.getElementById('mode-btn-story');
+      const btnPlanet = document.getElementById('mode-btn-planetarium');
+
+      if (mode === 'story') {
+        planetWrap.classList.add('hidden');
+        storyWrap.classList.remove('hidden');
+        btnStory.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-amber-400 text-slate-950 shadow";
+        btnPlanet.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-slate-300 hover:text-white";
+      } else {
+        storyWrap.classList.add('hidden');
+        planetWrap.classList.remove('hidden');
+        btnPlanet.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-sky-400 text-slate-950 shadow";
+        btnStory.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-slate-300 hover:text-white";
+        handlePlanetariumResize();
+      }
+    }
+
+    function startStorybook(chapterIdx = 0) {
+      initAudioEngine();
+      document.getElementById('experiencia').scrollIntoView({ behavior: 'smooth' });
+      switchMainMode('story');
+      document.getElementById('view-splash').classList.add('hidden');
+      loadChapter(chapterIdx);
+    }
+
+    function openStellariumMode(sceneTarget = 'solar', artifactId = null) {
+      initAudioEngine();
+      document.getElementById('experiencia').scrollIntoView({ behavior: 'smooth' });
+      switchMainMode('planetarium');
+      switchScene(sceneTarget);
+      if (artifactId) {
+        selectFromRadar(artifactId);
+      }
+    }
+
+    function loadChapter(index) {
+      if (chapterIntroTimer) {
+        clearTimeout(chapterIntroTimer);
+        chapterIntroTimer = null;
+      }
+      isIntroShowing = true;
+      currentChapterIndex = index;
+      currentDialogueIndex = 0;
+      const ch = chapters[index];
+
+      const introView = document.getElementById('view-chapter-intro');
+      const sceneView = document.getElementById('view-scene');
+      document.getElementById('view-splash').classList.add('hidden');
+      sceneView.classList.add('hidden');
+      introView.classList.remove('hidden');
+
+      document.getElementById('intro-chapter-num').textContent = ch.num;
+      document.getElementById('intro-chapter-title').textContent = ch.title;
+      document.getElementById('intro-chapter-sub').textContent = ch.subtitle;
+
+      playChapterSoundEffect(ch.soundType);
+
+      if (voiceEnabled && 'speechSynthesis' in window) {
+        speakText(`${ch.num} ${ch.title}`, () => {
+          if (!isIntroShowing) return;
+          if (chapterIntroTimer) clearTimeout(chapterIntroTimer);
+          chapterIntroTimer = setTimeout(() => {
+            skipChapterIntro();
+          }, PAUSA_DESPUES_DEL_TITULO_MS);
+        });
+        chapterIntroTimer = setTimeout(() => {
+          if (isIntroShowing) skipChapterIntro();
+        }, 9000);
+      } else {
+        chapterIntroTimer = setTimeout(() => {
+          if (isIntroShowing) skipChapterIntro();
+        }, TIEMPO_INTRO_SIN_VOZ_MS);
+      }
+    }
+
+    function skipChapterIntro() {
+      if (!isIntroShowing) return;
+      isIntroShowing = false;
+      if (chapterIntroTimer) {
+        clearTimeout(chapterIntroTimer);
+        chapterIntroTimer = null;
+      }
+      stopCurrentSpeech();
+      document.getElementById('view-chapter-intro').classList.add('hidden');
+      document.getElementById('view-scene').classList.remove('hidden');
+      renderScene();
+    }
+
+    function renderScene() {
+      const ch = chapters[currentChapterIndex];
+      document.getElementById('scene-chapter-num').textContent = ch.num;
+      document.getElementById('scene-chapter-title').textContent = ch.title;
+      document.getElementById('scene-soundscape-badge').textContent = ch.soundLabel;
+      document.getElementById('scene-illustration').innerHTML = ch.svgIllustration;
+
+      renderChapterPills();
+      updateDialogueBubble();
+    }
+
+    function updateDialogueBubble() {
+      const ch = chapters[currentChapterIndex];
+      const box = document.getElementById('dialogue-box');
+      box.classList.remove('dialogue-pop');
+      void box.offsetWidth;
+      box.classList.add('dialogue-pop');
+
+      document.getElementById('dialogue-speaker').textContent = ch.speaker;
+      document.getElementById('dialogue-step-indicator').textContent = `${currentDialogueIndex + 1} / ${ch.dialogues.length}`;
+      document.getElementById('dialogue-text').textContent = `"${ch.dialogues[currentDialogueIndex]}"`;
+
+      playChapterSoundEffect(ch.soundType);
+      speakText(ch.dialogues[currentDialogueIndex]);
+
+      const nextBtn = document.getElementById('btn-next-line');
+      if (currentDialogueIndex === ch.dialogues.length - 1) {
+        nextBtn.textContent = currentChapterIndex < chapters.length - 1 ? "Siguiente Capítulo 🚀 →" : "Volver al Capítulo 1 ↺";
+      } else {
+        nextBtn.textContent = "Siguiente frase →";
+      }
+    }
+
+    function replayCurrentVoice() {
+      const ch = chapters[currentChapterIndex];
+      speakText(ch.dialogues[currentDialogueIndex]);
+    }
+
+    function nextDialogue() {
+      const ch = chapters[currentChapterIndex];
+      if (currentDialogueIndex < ch.dialogues.length - 1) {
+        currentDialogueIndex++;
+        updateDialogueBubble();
+      } else {
+        const nextCh = (currentChapterIndex + 1) % chapters.length;
+        loadChapter(nextCh);
+      }
+    }
+
+    function prevDialogue() {
+      if (currentDialogueIndex > 0) {
+        currentDialogueIndex--;
+        updateDialogueBubble();
+      } else if (currentChapterIndex > 0) {
+        loadChapter(currentChapterIndex - 1);
+      }
+    }
+
+    function renderChapterPills() {
+      const container = document.getElementById('chapter-pills');
+      container.innerHTML = chapters.map((c, idx) => `
+        <button onclick="loadChapter(${idx})" class="px-3 py-1 rounded-lg text-xs font-semibold transition ${
+          idx === currentChapterIndex
+            ? 'bg-amber-400 text-slate-950 font-bold'
+            : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+        }">
+          Cap. ${idx + 1}
+        </button>
+      `).join('');
+    }
+
+    function locateCurrentChapterInPlanetarium() {
+      const ch = chapters[currentChapterIndex];
+      openStellariumMode(ch.targetScene, ch.targetArtifactId);
+    }
+
+    function openNasaInfoModal() {
+      const ch = chapters[currentChapterIndex];
+      const d = ch.nasaData;
+      document.getElementById('nasa-info-content').innerHTML = `
+        <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/20 text-amber-300">
+          🛰️ Ficha Oficial NASA Science / NSSDCA • ${ch.num}
+        </span>
+        <h3 class="text-xl md:text-2xl font-display font-bold text-white mt-3 mb-4">${d.mission}</h3>
+        <div class="space-y-3 text-xs md:text-sm text-slate-200">
+          <p><strong class="text-amber-300">📍 Ubicación y Coordenadas:</strong> ${d.location}</p>
+          <p><strong class="text-amber-300">📅 Fechas Clave:</strong> ${d.dates}</p>
+          <p><strong class="text-amber-300">🛠️ Instrumentación y Componentes:</strong> ${d.hardware}</p>
+          <p><strong class="text-amber-300">✨ Datos Curiosos y Récords:</strong> ${d.facts}</p>
+        </div>
+        <div class="mt-5 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap gap-3">
+            ${d.links.map(l => `<a href="${l}" target="_blank" class="text-xs text-sky-400 hover:underline font-mono">🔗 Catálogo NASA ↗</a>`).join('')}
+          </div>
+          <button onclick="closeNasaInfoModal(); locateCurrentChapterInPlanetarium();" class="px-4 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs">
+            🪐 Ver en Planetario 3D
+          </button>
+        </div>
+      `;
+      document.getElementById('nasa-info-modal').classList.remove('hidden');
+    }
+
+    function closeNasaInfoModal() {
+      document.getElementById('nasa-info-modal').classList.add('hidden');
+    }
+
+    function toggleFullscreenStage() {
+      const stage = document.getElementById('story-stage-container');
+      if (!document.fullscreenElement) {
+        stage.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    document.addEventListener('fullscreenchange', () => {
+      setTimeout(handlePlanetariumResize, 120);
+    });
+
+    let currentLang = 'es';
+    let currentScene = 'solar';
+    let currentDim = '3d';
+    let currentInfoTab = 'basic';
+    let autoRotate = true;
+    let showOrbits = true;
+    let speedMultiplier = 1.0;
+    let selectedArtifact = null;
+
+    const I18N = {
+      es: {
+        appTitle: "ECOS DEL SISTEMA SOLAR (20 MISIONES)",
+        navSolar: "El Sistema Solar (8)",
+        navMoon: "La Luna",
+        navMars: "Marte",
+        btnSettings: "Ajustes",
+        radarTitle: "CATÁLOGO DE OBJETOS",
+        radarCount: (n) => `${n} artefactos registrados`,
+        btnCenter: "Centrar",
+        tabBasic: "Información Básica",
+        tabDetailed: "Información Detallada"
+      },
+      en: {
+        appTitle: "ECHOES OF THE SOLAR SYSTEM (20 MISSIONS)",
+        navSolar: "Solar System (8)",
+        navMoon: "The Moon",
+        navMars: "Mars",
+        btnSettings: "Settings",
+        radarTitle: "OBJECT CATALOG",
+        radarCount: (n) => `${n} registered artifacts`,
+        btnCenter: "Center",
+        tabBasic: "Basic Info",
+        tabDetailed: "Detailed Info"
+      }
+    };
+
+    const container3D = document.getElementById('canvas-3d-container');
+    const container2D = document.getElementById('canvas-2d-container');
+    const canvas2D = document.getElementById('map-2d-canvas');
+    const ctx2D = canvas2D.getContext('2d');
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, 16 / 9, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container3D.appendChild(renderer.domElement);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const sunLight = new THREE.PointLight(0xffffff, 1.6, 300);
+    scene.add(sunLight);
+
+    const starGeo = new THREE.BufferGeometry();
+    const starPos = new Float32Array(2400 * 3);
+    for (let i = 0; i < 2400 * 3; i++) starPos[i] = (Math.random() - 0.5) * 400;
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xdbeafe, size: 0.25 })));
+
+    function makeTextSprite(text, color = '#e2e8f0') {
+      const c = document.createElement('canvas');
+      c.width = 256;
+      c.height = 64;
+      const g = c.getContext('2d');
+      g.font = 'bold 22px monospace';
+      g.textAlign = 'center';
+      g.fillStyle = 'rgba(4, 8, 16, 0.8)';
+      g.fillRect(10, 12, 236, 38);
+      g.strokeStyle = color;
+      g.lineWidth = 2;
+      g.strokeRect(10, 12, 236, 38);
+      g.fillStyle = color;
+      g.fillText(text, 128, 38);
+      const tex = new THREE.CanvasTexture(c);
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+      const sprite = new THREE.Sprite(mat);
+      sprite.scale.set(2.5, 0.62, 1);
+      return sprite;
+    }
+
+    function makeSurfaceCanvas(mode) {
+      const c = document.createElement('canvas');
+      c.width = 1024;
+      c.height = 512;
+      const g = c.getContext('2d');
+
+      if (mode === 'moon') {
+        g.fillStyle = '#7c8591';
+        g.fillRect(0, 0, 1024, 512);
+        for (let i = 0; i < 140; i++) {
+          g.fillStyle = i % 3 === 0 ? 'rgba(45, 52, 62, 0.55)' : 'rgba(165, 175, 188, 0.35)';
+          g.beginPath();
+          g.arc(Math.random() * 1024, Math.random() * 512, Math.random() * 45 + 4, 0, Math.PI * 2);
+          g.fill();
+        }
+      } else {
+        g.fillStyle = '#b8532c';
+        g.fillRect(0, 0, 1024, 512);
+        for (let i = 0; i < 110; i++) {
+          g.fillStyle = i % 2 === 0 ? 'rgba(115, 42, 18, 0.5)' : 'rgba(218, 122, 74, 0.35)';
+          g.beginPath();
+          g.arc(Math.random() * 1024, Math.random() * 512, Math.random() * 48 + 6, 0, Math.PI * 2);
+          g.fill();
+        }
+      }
+      return c;
+    }
+
+    // Texturas base y carga exclusiva de luna.jpg y marte.jpg
+    const textures = {
+      moon_wac: new THREE.CanvasTexture(makeSurfaceCanvas('moon')),
+      mars_wac: new THREE.CanvasTexture(makeSurfaceCanvas('mars'))
+    };
+
+    const textureLoader = new THREE.TextureLoader();
+
+    function loadOptionalTexture(fileName, onSuccess) {
+      textureLoader.load(
+        fileName,
+        (tex) => {
+          onSuccess(tex);
+          buildScene(currentScene);
+          if (currentDim === '2d') draw2DMap();
+        },
+        undefined,
+        () => {}
+      );
+    }
+
+    loadOptionalTexture('luna.jpg', (tex) => { textures.moon_wac = tex; });
+    loadOptionalTexture('marte.jpg', (tex) => { textures.mars_wac = tex; });
+
+    const rootGroup = new THREE.Group();
+    scene.add(rootGroup);
+
+    let orbitLines = [];
+    let solarBodies = [];
+    let selectableMeshes = [];
+
+    const SOLAR_PLANETS = [
+      { name: "Mercurio", dist: 4.0, radius: 0.24, color: 0x9ca3af, speed: 0.018, selectable: false },
+      { name: "Venus", dist: 5.8, radius: 0.38, color: 0xeab308, speed: 0.013, selectable: false },
+      { name: "Tierra", dist: 8.0, radius: 0.42, color: 0x2563eb, speed: 0.010, selectable: false, hasMoon: true },
+      { name: "Marte ★", dist: 10.6, radius: 0.36, color: 0xd9532f, speed: 0.008, selectable: true, target: 'mars' },
+      { name: "Júpiter", dist: 14.2, radius: 0.92, color: 0xd97706, speed: 0.005, selectable: false },
+      { name: "Saturno", dist: 18.2, radius: 0.78, color: 0xfacc15, speed: 0.0038, selectable: false, hasRing: true },
+      { name: "Urano", dist: 22.0, radius: 0.56, color: 0x38bdf8, speed: 0.0026, selectable: false },
+      { name: "Neptuno", dist: 25.5, radius: 0.54, color: 0x3b82f6, speed: 0.0020, selectable: false }
+    ];
+
+    function buildScene(mode) {
+      while (rootGroup.children.length > 0) rootGroup.remove(rootGroup.children[0]);
+      orbitLines = [];
+      solarBodies = [];
+      selectableMeshes = [];
+
+      if (mode === 'solar') {
+        camera.position.set(0, 18, 34);
+        camera.lookAt(0, 0, 0);
+
+        const sun = new THREE.Mesh(
+          new THREE.SphereGeometry(2.1, 64, 64),
+          new THREE.MeshBasicMaterial({ color: 0xfbbf24 })
+        );
+
+        const sunGlow = new THREE.Mesh(
+          new THREE.SphereGeometry(2.32, 32, 32),
+          new THREE.MeshBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.22 })
+        );
+        sun.add(sunGlow);
+
+        const sunLabel = makeTextSprite("SOL", "#fbbf24");
+        sunLabel.position.set(0, 2.9, 0);
+        sun.add(sunLabel);
+        rootGroup.add(sun);
+
+        SOLAR_PLANETS.forEach((p, idx) => {
+          const orbitGeo = new THREE.RingGeometry(p.dist - 0.03, p.dist + 0.03, 96);
+          const orbitMat = new THREE.MeshBasicMaterial({
+            color: p.selectable ? 0x38bdf8 : 0x334155,
+            side: THREE.DoubleSide
+          });
+          const orbitRing = new THREE.Mesh(orbitGeo, orbitMat);
+          orbitRing.rotation.x = Math.PI / 2;
+          orbitRing.visible = showOrbits;
+          rootGroup.add(orbitRing);
+          orbitLines.push(orbitRing);
+
+          const pivot = new THREE.Group();
+          pivot.rotation.y = idx * 0.9;
+          rootGroup.add(pivot);
+
+          // Solo Marte usa marte.jpg; los demás planetas usan su color por código
+          const planetMat = p.target === 'mars'
+            ? new THREE.MeshStandardMaterial({ map: textures.mars_wac, roughness: 0.85 })
+            : new THREE.MeshStandardMaterial({ color: p.color, roughness: 0.75 });
+
+          const mesh = new THREE.Mesh(
+            new THREE.SphereGeometry(p.radius, 32, 32),
+            planetMat
+          );
+          mesh.position.x = p.dist;
+          pivot.add(mesh);
+
+          const label = makeTextSprite(p.name, p.selectable ? "#38bdf8" : "#cbd5e1");
+          label.position.set(0, p.radius + 0.65, 0);
+          mesh.add(label);
+
+          // Marte sigue siendo clicable pero sin anillo alrededor
+          if (p.selectable) {
+            mesh.userData = { type: 'planet', target: p.target };
+            selectableMeshes.push(mesh);
+          }
+
+          // Único planeta con anillos reales (Saturno)
+          if (p.hasRing) {
+            const satRing = new THREE.Mesh(
+              new THREE.RingGeometry(p.radius * 1.35, p.radius * 2.1, 48),
+              new THREE.MeshBasicMaterial({ color: 0xfde047, side: THREE.DoubleSide, transparent: true, opacity: 0.65 })
+            );
+            satRing.rotation.x = Math.PI / 2.3;
+            mesh.add(satRing);
+          }
+
+          // La Luna gira alrededor de la Tierra con su textura real y sin anillo
+          if (p.hasMoon) {
+            const moonPivot = new THREE.Group();
+            mesh.add(moonPivot);
+            const moonMesh = new THREE.Mesh(
+              new THREE.SphereGeometry(0.18, 24, 24),
+              new THREE.MeshStandardMaterial({ map: textures.moon_wac, roughness: 0.85 })
+            );
+            moonMesh.position.x = 1.15;
+            moonMesh.userData = { type: 'planet', target: 'moon' };
+
+            const moonLabel = makeTextSprite("Luna ★", "#38bdf8");
+            moonLabel.position.set(0, 0.55, 0);
+            moonLabel.scale.set(1.8, 0.45, 1);
+            moonMesh.add(moonLabel);
+
+            moonPivot.add(moonMesh);
+            selectableMeshes.push(moonMesh);
+            solarBodies.push({ pivot: moonPivot, speed: 0.035 });
+          }
+
+          solarBodies.push({ pivot, speed: p.speed });
+        });
+
+        const deepSpaceCoords = [
+          { id: "kepler", dist: 9.2, angle: 2.1, y: 0.8, label: "Kepler ★" },
+          { id: "near", dist: 11.8, angle: 3.8, y: -0.6, label: "NEAR (Eros) ★" },
+          { id: "dawn", dist: 12.6, angle: 0.7, y: 0.9, label: "Dawn (Ceres) ★" },
+          { id: "pioneer10", dist: 27.5, angle: 1.3, y: 2.2, label: "Pioneer 10 ★" }
+        ];
+
+        deepSpaceCoords.forEach(ds => {
+          const art = ARTIFACTS.find(a => a.id === ds.id);
+          if (!art) return;
+          const pivot = new THREE.Group();
+          pivot.rotation.y = ds.angle;
+          rootGroup.add(pivot);
+
+          const probeMesh = new THREE.Mesh(
+            new THREE.OctahedronGeometry(0.24, 0),
+            new THREE.MeshBasicMaterial({ color: 0xfbbf24 })
+          );
+          probeMesh.position.set(ds.dist, ds.y, 0);
+          probeMesh.userData = { type: 'artifact', artifact: art };
+
+          const sp = makeTextSprite(ds.label, "#fbbf24");
+          sp.position.set(0, 0.65, 0);
+          sp.scale.set(2.1, 0.5, 1);
+          probeMesh.add(sp);
+
+          pivot.add(probeMesh);
+          selectableMeshes.push(probeMesh);
+          solarBodies.push({ pivot, speed: 0.003 });
+        });
+
+      } else {
+        camera.position.set(0, 0, 6.2);
+        camera.lookAt(0, 0, 0);
+
+        const texKey = `${mode}_wac`;
+        const planetMesh = new THREE.Mesh(
+          new THREE.SphereGeometry(2.2, 64, 64),
+          new THREE.MeshStandardMaterial({ map: textures[texKey], roughness: 0.85 })
+        );
+        rootGroup.add(planetMesh);
+
+        const list = ARTIFACTS.filter(a => a.body === mode);
+        list.forEach(art => {
+          const phi = (90 - art.lat) * (Math.PI / 180);
+          const theta = (art.lon + 180) * (Math.PI / 180);
+          const r = 2.24;
+          const x = -(r * Math.sin(phi) * Math.cos(theta));
+          const y = r * Math.cos(phi);
+          const z = r * Math.sin(phi) * Math.sin(theta);
+
+          const marker = new THREE.Mesh(
+            new THREE.SphereGeometry(0.075, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 0x38bdf8 })
+          );
+          marker.position.set(x, y, z);
+          marker.userData = { type: 'artifact', artifact: art };
+
+          const ring = new THREE.Mesh(
+            new THREE.RingGeometry(0.10, 0.14, 24),
+            new THREE.MeshBasicMaterial({ color: 0xfbbf24, side: THREE.DoubleSide })
+          );
+          ring.lookAt(new THREE.Vector3(x * 2, y * 2, z * 2));
+          marker.add(ring);
+
+          rootGroup.add(marker);
+          selectableMeshes.push(marker);
+        });
+      }
+    }
+
+    let map2DZoom = 1.0;
+    let map2DOffset = { x: 0, y: 0 };
+    let isDragging2D = false;
+    let prev2DMouse = { x: 0, y: 0 };
+
+    function getStageDimensions() {
+      const stage = document.getElementById('story-stage-container');
+      return {
+        w: stage.clientWidth || window.innerWidth,
+        h: stage.clientHeight || 640
+      };
+    }
+
+    function draw2DMap() {
+      if (currentDim !== '2d' || currentScene === 'solar') return;
+      const { w, h } = getStageDimensions();
+      canvas2D.width = w;
+      canvas2D.height = h;
+
+      ctx2D.fillStyle = '#04070e';
+      ctx2D.fillRect(0, 0, w, h);
+
+      const mapW = w * 0.80 * map2DZoom;
+      const mapH = mapW * 0.5;
+      const startX = (w - mapW) / 2 + map2DOffset.x;
+      const startY = (h - mapH) / 2 + map2DOffset.y;
+
+      const surfCanvas = textures[`${currentScene}_wac`].image;
+      ctx2D.drawImage(surfCanvas, startX, startY, mapW, mapH);
+
+      ctx2D.strokeStyle = 'rgba(56, 189, 248, 0.22)';
+      ctx2D.lineWidth = 1;
+      ctx2D.font = '10px monospace';
+      ctx2D.fillStyle = 'rgba(148, 163, 184, 0.85)';
+
+      for (let lon = -180; lon <= 180; lon += 30) {
+        const x = startX + ((lon + 180) / 360) * mapW;
+        ctx2D.beginPath();
+        ctx2D.moveTo(x, startY);
+        ctx2D.lineTo(x, startY + mapH);
+        ctx2D.stroke();
+        ctx2D.fillText(`${lon}°`, x + 3, startY + 12);
+      }
+
+      for (let lat = -90; lat <= 90; lat += 30) {
+        const y = startY + ((90 - lat) / 180) * mapH;
+        ctx2D.beginPath();
+        ctx2D.moveTo(startX, y);
+        ctx2D.lineTo(startX + mapW, y);
+        ctx2D.stroke();
+        ctx2D.fillText(`${lat}°`, startX + 4, y - 4);
+      }
+
+      const list = ARTIFACTS.filter(a => a.body === currentScene);
+      list.forEach(art => {
+        const normLon = art.lon > 180 ? art.lon - 360 : art.lon;
+        const ax = startX + ((normLon + 180) / 360) * mapW;
+        const ay = startY + ((90 - art.lat) / 180) * mapH;
+
+        const isSel = selectedArtifact && selectedArtifact.id === art.id;
+        ctx2D.strokeStyle = isSel ? '#fbbf24' : '#38bdf8';
+        ctx2D.lineWidth = isSel ? 2.5 : 1.5;
+        ctx2D.strokeRect(ax - 8, ay - 8, 16, 16);
+
+        ctx2D.fillStyle = isSel ? '#fbbf24' : '#38bdf8';
+        ctx2D.beginPath();
+        ctx2D.arc(ax, ay, 4, 0, Math.PI * 2);
+        ctx2D.fill();
+
+        ctx2D.fillStyle = '#ffffff';
+        ctx2D.font = 'bold 11px monospace';
+        ctx2D.fillText(art[currentLang].name, ax + 12, ay + 4);
+
+        art._screen2D = { x: ax, y: ay };
+      });
+    }
+
+    canvas2D.addEventListener('mousedown', (e) => {
+      isDragging2D = true;
+      prev2DMouse = { x: e.clientX, y: e.clientY };
+    });
+
+    window.addEventListener('mouseup', () => { isDragging2D = false; });
+
+    canvas2D.addEventListener('mousemove', (e) => {
+      const rect = canvas2D.getBoundingClientRect();
+      const localX = e.clientX - rect.left;
+      const localY = e.clientY - rect.top;
+
+      const w = canvas2D.width;
+      const h = canvas2D.height;
+      const mapW = w * 0.80 * map2DZoom;
+      const mapH = mapW * 0.5;
+      const startX = (w - mapW) / 2 + map2DOffset.x;
+      const startY = (h - mapH) / 2 + map2DOffset.y;
+
+      const lon = (((localX - startX) / mapW) * 360 - 180).toFixed(4);
+      const lat = (90 - ((localY - startY) / mapH) * 180).toFixed(4);
+      if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+        document.getElementById('cursor-coords').innerText = `Lat: ${lat}° | Lon: ${lon}°`;
+      }
+
+      if (!isDragging2D) return;
+      map2DOffset.x += e.clientX - prev2DMouse.x;
+      map2DOffset.y += e.clientY - prev2DMouse.y;
+      prev2DMouse = { x: e.clientX, y: e.clientY };
+      draw2DMap();
+    });
+
+    canvas2D.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      map2DZoom = Math.max(0.7, Math.min(4.0, map2DZoom - e.deltaY * 0.001));
+      draw2DMap();
+    }, { passive: false });
+
+    canvas2D.addEventListener('click', (e) => {
+      const rect = canvas2D.getBoundingClientRect();
+      const localX = e.clientX - rect.left;
+      const localY = e.clientY - rect.top;
+
+      const list = ARTIFACTS.filter(a => a.body === currentScene);
+      list.forEach(art => {
+        if (art._screen2D && Math.hypot(localX - art._screen2D.x, localY - art._screen2D.y) < 18) {
+          openArtifact(art);
+        }
+      });
+    });
+
+    let isDragging3D = false;
+    let prev3DMouse = { x: 0, y: 0 };
+
+    container3D.addEventListener('mousedown', (e) => {
+      isDragging3D = true;
+      prev3DMouse = { x: e.clientX, y: e.clientY };
+    });
+
+    window.addEventListener('mouseup', () => { isDragging3D = false; });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging3D || currentDim !== '3d' || mainMode !== 'planetarium') return;
+      const dx = e.clientX - prev3DMouse.x;
+      const dy = e.clientY - prev3DMouse.y;
+      rootGroup.rotation.y += dx * 0.006;
+      rootGroup.rotation.x = Math.max(-1.2, Math.min(1.2, rootGroup.rotation.x + dy * 0.006));
+      prev3DMouse = { x: e.clientX, y: e.clientY };
+    });
+
+    container3D.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY > 0 ? 1.08 : 0.92;
+      const currentDist = camera.position.length();
+      const minDist = currentScene === 'solar' ? 5.5 : 3.2;
+      const maxDist = currentScene === 'solar' ? 65.0 : 18.0;
+      const targetDist = Math.max(minDist, Math.min(maxDist, currentDist * zoomFactor));
+      camera.position.normalize().multiplyScalar(targetDist);
+      camera.lookAt(0, 0, 0);
+    }, { passive: false });
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    container3D.addEventListener('click', (e) => {
+      if (currentDim !== '3d') return;
+      const rect = container3D.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(selectableMeshes);
+      if (hits.length > 0) {
+        const data = hits[0].object.userData;
+        if (data.type === 'planet') switchScene(data.target);
+        if (data.type === 'artifact') openArtifact(data.artifact);
+      }
+    });
+
+    function switchScene(mode) {
+      currentScene = mode;
+      ['solar', 'moon', 'mars'].forEach(id => {
+        const btn = document.getElementById('btn-' + id);
+        btn.className = id === mode
+          ? "stellarium-btn stellarium-btn-active px-2.5 py-1 text-xs font-mono flex items-center gap-1"
+          : "stellarium-btn px-2.5 py-1 text-xs font-mono flex items-center gap-1";
+      });
+
+      const viewGroup = document.getElementById('view-mode-group');
+      const solarHint = document.getElementById('solar-hint');
+      if (mode === 'solar') {
+        viewGroup.classList.add('hidden');
+        viewGroup.classList.remove('flex');
+        solarHint.classList.remove('hidden');
+        setDimension('3d');
+      } else {
+        viewGroup.classList.remove('hidden');
+        viewGroup.classList.add('flex');
+        solarHint.classList.add('hidden');
+      }
+
+      rootGroup.rotation.set(0, 0, 0);
+      buildScene(mode);
+      renderRadarList();
+      if (currentDim === '2d') draw2DMap();
+    }
+
+    function setDimension(dim) {
+      currentDim = dim;
+      document.getElementById('btn-dim-3d').className = dim === '3d' ? "stellarium-btn stellarium-btn-active px-2 py-1 text-xs font-mono" : "stellarium-btn px-2 py-1 text-xs font-mono";
+      document.getElementById('btn-dim-2d').className = dim === '2d' ? "stellarium-btn stellarium-btn-active px-2 py-1 text-xs font-mono" : "stellarium-btn px-2 py-1 text-xs font-mono";
+
+      if (dim === '2d' && currentScene !== 'solar') {
+        container3D.classList.add('hidden');
+        container2D.classList.remove('hidden');
+        draw2DMap();
+      } else {
+        container2D.classList.add('hidden');
+        container3D.classList.remove('hidden');
+      }
+    }
+
+    function renderRadarList() {
+      const listEl = document.getElementById('artifact-list');
+      const filtered = currentScene === 'solar' ? ARTIFACTS : ARTIFACTS.filter(a => a.body === currentScene);
+
+      document.getElementById('count-moon').innerText = ARTIFACTS.filter(a => a.body === 'moon').length;
+      document.getElementById('count-mars').innerText = ARTIFACTS.filter(a => a.body === 'mars').length;
+      document.getElementById('ui-radar-subtitle').innerText = I18N[currentLang].radarCount(filtered.length);
+
+      listEl.innerHTML = filtered.map(art => `
+        <button onclick="selectFromRadar('${art.id}')" class="w-full text-left p-2 stellarium-btn block ${selectedArtifact && selectedArtifact.id === art.id ? 'stellarium-btn-active' : ''}">
+          <div class="text-[9px] font-mono text-sky-400 uppercase">${art.body.toUpperCase()} • ${art.nssdca}</div>
+          <div class="text-xs font-bold font-mono text-white mt-0.5">${art[currentLang].name}</div>
+          <div class="text-[10px] font-mono text-slate-400">Lat ${art.lat}° | Lon ${art.lon}°</div>
+        </button>
+      `).join('');
+    }
+
+    function selectFromRadar(id) {
+      const art = ARTIFACTS.find(a => a.id === id);
+      if (!art) return;
+      if (currentScene !== art.body) switchScene(art.body);
+
+      if (art.body !== 'solar') {
+        const lonRad = (art.lon + 90) * (Math.PI / 180);
+        const latRad = art.lat * (Math.PI / 180);
+        rootGroup.rotation.y = -lonRad;
+        rootGroup.rotation.x = latRad * 0.6;
+      }
+
+      openArtifact(art);
+      renderRadarList();
+      if (currentDim === '2d') draw2DMap();
+    }
+
+    function openArtifact(art) {
+      selectedArtifact = art;
+      playQuindarTone(true);
+
+      const badgeLabel = art.body === 'moon' ? 'LUNA' : (art.body === 'mars' ? 'MARTE' : 'ESPACIO PROFUNDO');
+      document.getElementById('detail-panel').classList.remove('hidden');
+      document.getElementById('detail-badge').innerText = badgeLabel;
+      document.getElementById('detail-nssdca').innerText = `NSSDCA: ${art.nssdca}`;
+      document.getElementById('detail-title').innerText = art[currentLang].name;
+      document.getElementById('detail-coords').innerText = `Lat: ${art.lat.toFixed(4)}° | Lon: ${art.lon.toFixed(4)}°`;
+      document.getElementById('cursor-coords').innerText = `Lat: ${art.lat.toFixed(4)}° | Lon: ${art.lon.toFixed(4)}°`;
+
+      document.getElementById('detail-objectives').innerText = art[currentLang].objectives || '';
+      document.getElementById('detail-story').innerText = art[currentLang].story;
+      document.getElementById('detail-science').innerText = art[currentLang].science;
+
+      document.getElementById('tech-nssdca').innerText = art.nssdca;
+      document.getElementById('tech-date').innerText = art.date;
+      document.getElementById('tech-mass').innerText = art.mass;
+      document.getElementById('tech-power').innerText = art.power;
+      document.getElementById('tech-status').innerText = art.status;
+      document.getElementById('tech-coords').innerText = `${art.lat}°, ${art.lon}°`;
+      document.getElementById('tech-instruments').innerText = art.instruments;
+    }
+
+    function narrateSelectedArtifact() {
+      if (!selectedArtifact) return;
+      const ch = chapters[selectedArtifact.chapterIndex || 0];
+      playChapterSoundEffect(ch.soundType);
+      const objText = selectedArtifact[currentLang].objectives ? `Objetivos: ${selectedArtifact[currentLang].objectives}. ` : '';
+      speakText(`${selectedArtifact[currentLang].name}. ${objText}${selectedArtifact[currentLang].story}`);
+    }
+
+    function jumpFromArtifactToStoryChapter() {
+      if (!selectedArtifact) return;
+      startStorybook(selectedArtifact.chapterIndex || 0);
+    }
+
+    function setInfoTab(tab) {
+      currentInfoTab = tab;
+      document.getElementById('tab-basic').className = tab === 'basic'
+        ? "stellarium-btn stellarium-btn-active py-1 text-[11px] font-mono font-semibold"
+        : "stellarium-btn py-1 text-[11px] font-mono font-semibold";
+      document.getElementById('tab-detailed').className = tab === 'detailed'
+        ? "stellarium-btn stellarium-btn-active py-1 text-[11px] font-mono font-semibold"
+        : "stellarium-btn py-1 text-[11px] font-mono font-semibold";
+
+      document.getElementById('info-basic-view').classList.toggle('hidden', tab !== 'basic');
+      document.getElementById('info-detailed-view').classList.toggle('hidden', tab !== 'detailed');
+    }
+
+    function closeDetail() {
+      document.getElementById('detail-panel').classList.add('hidden');
+      selectedArtifact = null;
+      renderRadarList();
+    }
+
+    function toggleSection(bodyId, arrowId) {
+      const body = document.getElementById(bodyId);
+      const arrow = document.getElementById(arrowId);
+      const isHidden = body.classList.toggle('hidden');
+      if (arrow) arrow.innerText = isHidden ? '▲' : '▼';
+    }
+
+    function resetCamera() {
+      rootGroup.rotation.set(0, 0, 0);
+      map2DZoom = 1.0;
+      map2DOffset = { x: 0, y: 0 };
+      if (currentScene === 'solar') camera.position.set(0, 18, 34);
+      else camera.position.set(0, 0, 6.2);
+      camera.lookAt(0, 0, 0);
+      draw2DMap();
+    }
+
+    function toggleAutoRotate() {
+      autoRotate = !autoRotate;
+      document.getElementById('btn-rotate').innerText = `Órbita/Giro: ${autoRotate ? 'ON' : 'OFF'}`;
+    }
+
+    function toggleOrbits() {
+      showOrbits = !showOrbits;
+      orbitLines.forEach(line => { line.visible = showOrbits; });
+      document.getElementById('btn-orbits').innerText = `Órbitas: ${showOrbits ? 'ON' : 'OFF'}`;
+    }
+
+    function toggleSettings() {
+      const modal = document.getElementById('settings-modal');
+      modal.classList.toggle('hidden');
+      modal.classList.toggle('flex');
+    }
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      const t = I18N[lang];
+      document.getElementById('lang-es').className = lang === 'es' ? "stellarium-btn stellarium-btn-active px-3 py-1" : "stellarium-btn px-3 py-1";
+      document.getElementById('lang-en').className = lang === 'en' ? "stellarium-btn stellarium-btn-active px-3 py-1" : "stellarium-btn px-3 py-1";
+
+      document.getElementById('ui-app-title').innerText = t.appTitle;
+      document.getElementById('ui-nav-solar').innerText = t.navSolar;
+      document.getElementById('ui-nav-moon').innerText = t.navMoon;
+      document.getElementById('ui-nav-mars').innerText = t.navMars;
+      document.getElementById('ui-btn-settings').innerText = t.btnSettings;
+      document.getElementById('ui-radar-title').innerText = t.radarTitle;
+      document.getElementById('ui-btn-center').innerText = t.btnCenter;
+      document.getElementById('tab-basic').innerText = t.tabBasic;
+      document.getElementById('tab-detailed').innerText = t.tabDetailed;
+
+      renderRadarList();
+      if (selectedArtifact) openArtifact(selectedArtifact);
+      draw2DMap();
+    }
+
+    function updateSpeed(val) {
+      speedMultiplier = val / 10;
+      document.getElementById('speed-label').innerText = `${speedMultiplier.toFixed(1)}x`;
+    }
+
+    function handlePlanetariumResize() {
+      const { w, h } = getStageDimensions();
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+      draw2DMap();
+    }
+
+    window.addEventListener('resize', handlePlanetariumResize);
+
+    function animatePlanetarium() {
+      requestAnimationFrame(animatePlanetarium);
+      if (mainMode !== 'planetarium') return;
+      if (autoRotate && !isDragging3D && currentDim === '3d') {
+        if (currentScene === 'solar') {
+          solarBodies.forEach(b => { b.pivot.rotation.y += b.speed * speedMultiplier; });
+        } else {
+          rootGroup.rotation.y += 0.002 * speedMultiplier;
+        }
+      }
+      renderer.render(scene, camera);
+    }
+
+    function renderArchiveCards() {
+      const container = document.getElementById('cards-archive');
+      container.innerHTML = ARTIFACTS.map(art => `
+        <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 hover:border-amber-400/50 transition flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <span class="px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 font-mono text-[10px] uppercase">${art.body} • ${art.nssdca}</span>
+              <span class="text-[11px] text-amber-400 font-semibold">Cap. ${art.chapterIndex + 1}</span>
+            </div>
+            <h4 class="text-white font-bold text-sm mt-1">${art.es.name}</h4>
+            <p class="text-[11px] text-sky-300/90 font-mono mt-1">${art.date}</p>
+            <p class="text-slate-300 text-xs mt-2 leading-relaxed"><strong class="text-amber-300">Objetivos:</strong> ${art.es.objectives}</p>
+            <p class="text-slate-300 text-xs mt-1.5 leading-relaxed"><strong class="text-emerald-300">Resultados:</strong> ${art.es.story}</p>
+            <p class="text-slate-400 text-[11px] mt-1.5 leading-relaxed"><strong class="text-sky-300">Récord / Dato:</strong> ${art.es.science}</p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
+            <button onclick="startStorybook(${art.chapterIndex})" class="flex-1 py-1.5 px-2.5 rounded-lg bg-amber-400/15 hover:bg-amber-400/25 text-amber-300 border border-amber-400/30 font-semibold text-[11px] transition">
+              📖 Ir al Cuento
+            </button>
+            <button onclick="openStellariumMode('${art.body}', '${art.id}')" class="flex-1 py-1.5 px-2.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-400/30 font-semibold text-[11px] transition">
+              🪐 Ver en 3D/2D
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.onload = function () {
+      handlePlanetariumResize();
+      buildScene('solar');
+      renderRadarList();
+      renderArchiveCards();
+      animatePlanetarium();
+    };
+  </script>
+</body>
+</html>
